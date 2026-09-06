@@ -1,0 +1,13 @@
+# Assessment çıktıları (hassas olabilir — repoya girmesin)
+ad-assessment_*/
+ad-pentest_*/
+*.pyc
+__pycache__/
+
+# Toplanan kanıt / hash / bloodhound verisi
+*.ccache
+*.hash
+*.pfx
+*.zip
+evidence/
+loot/

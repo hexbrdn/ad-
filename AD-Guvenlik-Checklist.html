@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AD Güvenlik Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f4f6f9; --panel:#ffffff; --panel-2:#eef1f6; --border:#d8dee7;
+  --ink:#1b2430; --ink-soft:#5a6675; --ink-faint:#8592a3;
+  --accent:#0d9488; --accent-soft:#0d948815;
+  --crit:#e11d48; --warn:#d97706; --ok:#059669; --info:#2563eb;
+  --crit-bg:#e11d4818; --warn-bg:#d9770618; --ok-bg:#05966918;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme:dark){}
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1219; --panel:#141b25; --panel-2:#1b2431; --border:#293546;
+    --ink:#e7ecf2; --ink-soft:#9aa7b7; --ink-faint:#67748699;
+    --accent:#2dd4bf; --accent-soft:#2dd4bf1a;
+    --crit:#fb7185; --warn:#fbbf24; --ok:#34d399; --info:#60a5fa;
+    --crit-bg:#fb718522; --warn-bg:#fbbf2422; --ok-bg:#34d39922;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1219; --panel:#141b25; --panel-2:#1b2431; --border:#293546;
+  --ink:#e7ecf2; --ink-soft:#9aa7b7; --ink-faint:#67748699;
+  --accent:#2dd4bf; --accent-soft:#2dd4bf1a;
+  --crit:#fb7185; --warn:#fbbf24; --ok:#34d399; --info:#60a5fa;
+  --crit-bg:#fb718522; --warn-bg:#fbbf2422; --ok-bg:#34d39922;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);padding:16px 0}
+.hbar{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto}
+.logo{width:38px;height:38px;border-radius:9px;background:var(--accent-soft);border:1px solid var(--accent);display:grid;place-items:center;color:var(--accent);font-family:var(--mono);font-weight:600;font-size:15px}
+.brand h1{font-size:17px;margin:0;letter-spacing:-.01em}
+.brand p{margin:0;font-size:12px;color:var(--ink-faint);font-family:var(--mono)}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:12px;padding:7px 12px;border-radius:7px;border:1px solid var(--border);background:var(--panel);color:var(--ink-soft);cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* progress */
+.progress{display:flex;align-items:center;gap:14px;min-width:220px}
+.pbar{flex:1;height:8px;border-radius:99px;background:var(--panel-2);overflow:hidden;border:1px solid var(--border)}
+.pfill{height:100%;width:0;background:var(--accent);transition:width .4s ease}
+.pcount{font-family:var(--mono);font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* intro */
+.intro{margin:34px 0 26px}
+.intro .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+.intro h2{font-size:26px;margin:0 0 10px;letter-spacing:-.02em;text-wrap:balance;max-width:22ch}
+.intro p{margin:0;color:var(--ink-soft);max-width:66ch;font-size:14.5px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:99px;display:inline-block}
+
+/* section card */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.chead{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;user-select:none}
+.chead:hover{background:var(--panel-2)}
+.chead:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.num{font-family:var(--mono);font-size:12px;color:var(--ink-faint);width:26px;flex:none}
+.ctitle{flex:1;min-width:0}
+.ctitle h3{margin:0;font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+.ctitle .sub{margin:2px 0 0;font-size:12.5px;color:var(--ink-faint)}
+.sev{font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.05em;text-transform:uppercase;flex:none}
+.sev.crit{color:var(--crit);background:var(--crit-bg)}
+.sev.high{color:var(--warn);background:var(--warn-bg)}
+.sev.med{color:var(--info);background:#2563eb18}
+.mini{font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex:none;font-variant-numeric:tabular-nums}
+.chev{flex:none;color:var(--ink-faint);transition:transform .2s}
+.card.open .chev{transform:rotate(90deg)}
+
+.body{display:none;padding:4px 18px 18px 18px;border-top:1px solid var(--border)}
+.card.open .body{display:block}
+.desc{color:var(--ink-soft);font-size:13.5px;margin:14px 0 16px;max-width:70ch}
+
+/* check items */
+.item{display:flex;gap:11px;padding:9px 0;border-top:1px solid var(--border)}
+.item:first-of-type{border-top:none}
+.item input{appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:none;margin-top:1px;border:1.5px solid var(--ink-faint);border-radius:5px;cursor:pointer;position:relative;transition:.15s}
+.item input:hover{border-color:var(--accent)}
+.item input:checked{background:var(--accent);border-color:var(--accent)}
+.item input:checked::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.item input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.item label{font-size:13.5px;cursor:pointer;color:var(--ink)}
+.item input:checked + label{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--ink-faint)}
+
+/* tools / commands */
+.tools{margin-top:16px}
+.tools .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:11.5px;padding:3px 9px;border-radius:6px;background:var(--panel-2);border:1px solid var(--border);color:var(--ink-soft)}
+pre{margin:10px 0 0;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink);line-height:1.7}
+pre .c{color:var(--ink-faint)}
+
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--border);color:var(--ink-faint);font-size:12px;font-family:var(--mono);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="brand">
+      <div class="logo">AD</div>
+      <div>
+        <h1>Active Directory Güvenlik Checklist</h1>
+        <p>24 başlık · saldırı yüzeyi &amp; sertleştirme değerlendirmesi</p>
+      </div>
+    </div>
+    <div class="progress">
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
+      <span class="pcount" id="pcount">0 / 0</span>
+    </div>
+    <div class="controls">
+      <button class="btn" id="expand">Tümünü Aç</button>
+      <button class="btn" id="reset">Sıfırla</button>
+      <button class="btn" id="theme">Tema</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="intro">
+    <p class="eyebrow">Yetkili Değerlendirme · Blue &amp; Red Team</p>
+    <h2>Bir AD ortamının zayıf noktalarını sistematik olarak tara ve sertleştir</h2>
+    <p>Her başlık; <strong>ne olduğu</strong>, <strong>neden riskli olduğu</strong>, <strong>nasıl tespit edileceği</strong> ve <strong>nasıl kapatılacağı</strong> ile birlikte kontrol maddelerine ayrılmıştır. İşaretlerin tarayıcında otomatik kaydedilir. Bu araç yalnızca yetkili olduğun ortamlarda kullanılmalıdır.</p>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--crit)"></i> Kritik — sık istismar edilir, domain düşürebilir</span>
+      <span><i class="dot" style="background:var(--warn)"></i> Yüksek — ciddi yetki yükseltme riski</span>
+      <span><i class="dot" style="background:var(--info)"></i> Orta — bilgi sızıntısı / zincir halkası</span>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <footer>
+    Yerel olarak çalışır · veri tarayıcının localStorage'ında tutulur · dışarı hiçbir istek gitmez
+  </footer>
+</div>
+
+<script>
+const DATA = [
+ {
+  t:"SMB / NTLM Güvenliği", sev:"crit",
+  sub:"SMB imzalama, NTLM kimlik doğrulama akışı",
+  desc:"SMB imzalama zorunlu değilse relay saldırıları (NTLM relay) mümkün olur; kimlik doğrulama trafiği araya girilerek başka bir hedefte yeniden oynatılabilir. NTLM'in kendisi de challenge-response zayıflıkları taşır.",
+  items:[
+   "Tüm sunucularda ve DC'lerde SMB signing = Required olarak zorunlu kılınmış",
+   "SMBv1 tamamen devre dışı bırakılmış",
+   "Mümkün olan yerlerde NTLM devre dışı, Kerberos'a geçilmiş",
+   "NTLM kullanımı denetleniyor (Restrict NTLM: Audit → Deny)",
+   "SMB null session / anonymous erişim kapalı"
+  ],
+  tools:["nmap --script smb2-security-mode","crackmapexec smb","NetExec (nxc)","Get-SmbServerConfiguration"],
+  cmd:"nxc smb 10.0.0.0/24 --gen-relay-list relay_targets.txt   <span class='c'># imzasız hostları listele</span>\nGet-SmbServerConfiguration | Select EnableSecuritySignature,RequireSecuritySignature"
+ },
+ {
+  t:"LDAP Signing", sev:"crit",
+  sub:"LDAP oturum bütünlüğü zorunluluğu",
+  desc:"DC'ler LDAP signing gerektirmiyorsa, LDAP üzerinden yapılan kimlik doğrulama relay edilebilir (özellikle ADCS ve DC'ye karşı). LDAP signing zorunlu olmadığında NTLM relay ile DC üzerinde işlem yapılabilir.",
+  items:[
+   "DC'lerde LDAP server signing requirements = Require signing",
+   "GPO ile 'Domain controller: LDAP server signing requirements' zorunlu",
+   "İstemcilerde LDAP client signing = Require",
+   "Denetim modunda signing yapmayan istemciler tespit edilip düzeltilmiş"
+  ],
+  tools:["LdapRelayScan","NetExec ldap-checker","reg query","GPO"],
+  cmd:"nxc ldap dc01.corp.local -u user -p pass -M ldap-checker\npython LdapRelayScan.py -dc-ip 10.0.0.10 -method BOTH"
+ },
+ {
+  t:"LDAP Channel Binding", sev:"crit",
+  sub:"LDAPS kanal bağlama (EPA)",
+  desc:"Channel Binding Token (CBT) devre dışıysa, LDAPS (TLS) üzerinden yapılan kimlik doğrulama dahi relay edilebilir. LDAP signing tek başına yeterli değildir; LDAPS için channel binding şarttır.",
+  items:[
+   "DC'lerde LDAP channel binding = Always (Enforced)",
+   "Windows güncellemeleri sonrası CBT desteği doğrulanmış",
+   "Denetim logları (Event ID 3039/3074) incelenmiş",
+   "Eski istemcilerin CBT uyumu test edilmiş"
+  ],
+  tools:["NetExec ldap-checker","registry LdapEnforceChannelBinding"],
+  cmd:"reg query HKLM\\SYSTEM\\CurrentControlSet\\Services\\NTDS\\Parameters /v LdapEnforceChannelBinding"
+ },
+ {
+  t:"NTLMv1 / NTLMv2", sev:"high",
+  sub:"Zayıf kimlik doğrulama protokolü seviyeleri",
+  desc:"NTLMv1 kırılması kolay (DES) ve çalınan hash'ler kolayca cracklenebilir veya NTLM relay ile kullanılabilir. LmCompatibilityLevel düşükse NTLMv1 hâlâ kabul edilir.",
+  items:[
+   "LmCompatibilityLevel = 5 (yalnızca NTLMv2, LM &amp; NTLMv1 reddedilir)",
+   "LM hash saklama devre dışı (NoLMHash = 1)",
+   "NTLMv1 kullanan legacy sistemler tespit edilmiş",
+   "Responder/coercion ile NTLMv1 downgrade testi yapılmış"
+  ],
+  tools:["Responder","LmCompatibilityLevel GPO","hashcat -m 5500"],
+  cmd:"<span class='c'># NTLMv1 yakalanırsa hashcat ile:</span>\nhashcat -m 5500 ntlmv1.txt wordlist.txt"
+ },
+ {
+  t:"Relay'e Açık Sistemler", sev:"crit",
+  sub:"NTLM relay hedef yüzeyi",
+  desc:"İmzalama zorunlu olmayan SMB/LDAP/HTTP servisleri relay hedefidir. Coercion teknikleri (PetitPotam, PrinterBug, Coercer) ile makine hesapları zorla kimlik doğrulamaya itilir ve relay edilir.",
+  items:[
+   "İmzasız SMB hostları envanteri çıkarılmış ve kapatılmış",
+   "PetitPotam (MS-EFSRPC) yamaları uygulanmış",
+   "PrinterBug (MS-RPRN / spooler) DC'lerde spooler kapatılmış",
+   "WebDAV / HTTP endpoint relay (ADCS ESC8) engellenmiş",
+   "Coercion testleri (Coercer) ile doğrulama yapılmış"
+  ],
+  tools:["ntlmrelayx.py","Coercer","PetitPotam.py","printerbug.py","mitm6"],
+  cmd:"ntlmrelayx.py -t ldaps://dc01 --delegate-access\nCoercer coerce -u user -p pass -t 10.0.0.20 -l 10.0.0.99"
+ },
+ {
+  t:"Kerberos Delegation", sev:"high",
+  sub:"Genel delegasyon değerlendirmesi",
+  desc:"Kerberos delegation bir hesabın başka kullanıcılar adına servislere erişmesine izin verir. Yanlış yapılandırıldığında yetki yükseltme ve kimlik taklidi (impersonation) sağlar. Tüm delegation türleri envanterlenmelidir.",
+  items:[
+   "Tüm delegation yapılandırmaları envanterlenmiş",
+   "Hassas hesaplar 'Account is sensitive and cannot be delegated' ile korunmuş",
+   "Protected Users grubu kritik hesaplar için kullanılıyor",
+   "Gereksiz delegation izinleri kaldırılmış"
+  ],
+  tools:["BloodHound","PowerView Get-DomainUser -TrustedToAuth","ADSearch"],
+  cmd:"Get-DomainComputer -Unconstrained | select name\nGet-DomainUser -TrustedToAuth | select name,msds-allowedtodelegateto"
+ },
+ {
+  t:"Unconstrained Delegation", sev:"crit",
+  sub:"Kısıtsız delegasyon — en tehlikeli tür",
+  desc:"Unconstrained delegation olan bir hosta kimlik doğrulayan her kullanıcının TGT'si o hostun belleğinde saklanır. Bir DC'yi zorla (coercion) bu hosta doğrulatarak DC'nin TGT'si çalınabilir ve DCSync yapılabilir.",
+  items:[
+   "Unconstrained delegation olan host'lar (DC'ler hariç) tespit edilmiş",
+   "Gerekmeyen unconstrained delegation kaldırılmış",
+   "DC'lere coercion (spooler/PetitPotam) yolları kapatılmış",
+   "Kritik hesaplar 'cannot be delegated' + Protected Users ile korunmuş"
+  ],
+  tools:["Rubeus monitor","PowerView","BloodHound","printerbug.py"],
+  cmd:"Rubeus.exe monitor /interval:5 /nowrap   <span class='c'># TGT yakala</span>\nRubeus.exe ptt /ticket:&lt;base64&gt;"
+ },
+ {
+  t:"Constrained Delegation", sev:"high",
+  sub:"Kısıtlı delegasyon (S4U2Proxy)",
+  desc:"Bir hesap yalnızca belirli servislere delegation yapabilir; ancak 'protocol transition' (S4U2Self) açıksa herhangi bir kullanıcı taklit edilebilir. msDS-AllowedToDelegateTo listesindeki SPN'ler hedeftir.",
+  items:[
+   "msDS-AllowedToDelegateTo yapılandırmaları gözden geçirilmiş",
+   "'Use any authentication protocol' (protocol transition) minimize edilmiş",
+   "Delegation hedefleri (SPN) gerçekten gerekli olanlarla sınırlı",
+   "Alternatif servis SPN'leri (ör. HOST → CIFS/LDAP) riski değerlendirilmiş"
+  ],
+  tools:["Rubeus s4u","getST.py (impacket)","PowerView"],
+  cmd:"Rubeus.exe s4u /user:websvc /rc4:&lt;hash&gt; /impersonateuser:Administrator /msdsspn:cifs/dc01 /ptt"
+ },
+ {
+  t:"RBCD (Resource-Based Constrained Delegation)", sev:"crit",
+  sub:"msDS-AllowedToActOnBehalfOfOtherIdentity",
+  desc:"Hedef objenin msDS-AllowedToActOnBehalfOfOtherIdentity özelliğini yazma yetkin varsa, kontrol ettiğin bir bilgisayar hesabını ekleyip o hedef üzerinde herhangi bir kullanıcıyı taklit edebilirsin. Makine hesabı oluşturma (MAQ) ile zincirlenir.",
+  items:[
+   "Bilgisayar objelerinde yazma yetkilerinin (GenericWrite/WriteProperty) haritası çıkarılmış",
+   "MachineAccountQuota = 0 yapılmış (yetkisiz makine hesabı oluşturma engeli)",
+   "Beklenmeyen msDS-AllowedToActOnBehalfOf değerleri temizlenmiş",
+   "RBCD saldırı yolları BloodHound ile analiz edilmiş"
+  ],
+  tools:["rbcd.py (impacket)","PowerView Set-DomainRBCD","Rubeus","addcomputer.py"],
+  cmd:"addcomputer.py -computer-name FAKE$ -computer-pass P@ss corp/user:pass\nrbcd.py -delegate-from FAKE$ -delegate-to DC01$ -action write corp/user:pass"
+ },
+ {
+  t:"ACL Abuse", sev:"high",
+  sub:"AD nesne izinleri (DACL) kötüye kullanımı",
+  desc:"Yanlış yapılandırılmış nesne izinleri saldırganın kullanıcı/grup/GPO/OU üzerinde kontrol kazanmasına imkân tanır. Saldırı yolları çoğunlukla küçük yetkilerin zincirlenmesiyle domain admin'e ulaşır.",
+  items:[
+   "BloodHound ile tüm ACL tabanlı saldırı yolları çıkarılmış",
+   "Ayrıcalıklı gruplarda beklenmeyen yazma yetkileri kaldırılmış",
+   "AdminSDHolder ve SDProp mekanizması doğrulanmış",
+   "Kalıcılık (persistence) için eklenmiş anormal ACE'ler temizlenmiş"
+  ],
+  tools:["BloodHound / SharpHound","PowerView Get-DomainObjectAcl","aclpwn"],
+  cmd:"Get-DomainObjectAcl -Identity 'Domain Admins' -ResolveGUIDs | ? {$_.ActiveDirectoryRights -match 'Write'}"
+ },
+ {
+  t:"GenericAll / GenericWrite", sev:"high",
+  sub:"Tam veya yazma kontrolü ACE'leri",
+  desc:"GenericAll bir nesne üzerinde tam kontrol verir (parola sıfırlama, RBCD, grup üyeliği). GenericWrite ise SPN ekleyerek Kerberoasting, logon script veya RBCD saldırılarına imkân tanır.",
+  items:[
+   "Kullanıcı/bilgisayar objelerinde GenericAll/GenericWrite envanteri çıkarılmış",
+   "Targeted Kerberoasting (SPN ekleme) yolu değerlendirilmiş",
+   "Shadow Credentials (msDS-KeyCredentialLink yazma) riski kontrol edilmiş",
+   "Fazla yetkiler en az ayrıcalık ilkesine göre kısıtlanmış"
+  ],
+  tools:["PowerView Add-DomainObjectAcl","Whisker (shadow creds)","targetedKerberoast.py"],
+  cmd:"<span class='c'># Shadow Credentials (GenericWrite ile):</span>\nWhisker.exe add /target:victim$"
+ },
+ {
+  t:"WriteDACL / WriteOwner", sev:"high",
+  sub:"İzin ve sahiplik değiştirme yetkileri",
+  desc:"WriteOwner ile nesnenin sahibi olabilir, ardından WriteDACL ile kendine GenericAll verebilirsin. Bu ikili, domain nesneleri üzerinde tam kontrol ele geçirmenin klasik yoludur.",
+  items:[
+   "WriteDACL/WriteOwner içeren ACE'ler ayrıcalıklı nesnelerde tespit edilmiş",
+   "Domain root ve DC objelerinde bu haklar sıkı kontrol ediliyor (DCSync riski)",
+   "Owner değişikliği denetim (auditing) ile izleniyor",
+   "Gereksiz haklar kaldırılmış"
+  ],
+  tools:["PowerView Set-DomainObjectOwner","dacledit.py (impacket)"],
+  cmd:"Set-DomainObjectOwner -Identity victim -OwnerIdentity attacker\nAdd-DomainObjectAcl -TargetIdentity victim -Rights All -PrincipalIdentity attacker"
+ },
+ {
+  t:"ForceChangePassword", sev:"high",
+  sub:"Parola sıfırlama yetkisi (User-Force-Change-Password)",
+  desc:"Bu hakla bir hesabın parolasını eski parolayı bilmeden sıfırlayabilirsin. Servis veya ayrıcalıklı hesaplarda bulunması doğrudan hesap ele geçirmeye yol açar.",
+  items:[
+   "ForceChangePassword hakkına sahip principaller envanterlenmiş",
+   "Ayrıcalıklı hesaplar üzerinde bu hak kaldırılmış",
+   "Helpdesk delegasyonları yalnızca gerekli OU'larla sınırlı",
+   "Parola sıfırlama olayları (Event ID 4724) izleniyor"
+  ],
+  tools:["PowerView Set-DomainUserPassword","net rpc password","BloodHound"],
+  cmd:"Set-DomainUserPassword -Identity victim -AccountPassword (ConvertTo-SecureString 'Yeni!Parola1' -AsPlainText -Force)"
+ },
+ {
+  t:"GPO Misconfiguration", sev:"crit",
+  sub:"Group Policy nesnesi zafiyetleri",
+  desc:"Bir GPO üzerinde yazma yetkisi (WriteGPO/link) olan saldırgan, o GPO'nun uygulandığı tüm makinelerde kod çalıştırabilir. Ayrıca GPP içindeki cpassword ile parolalar sızabilir.",
+  items:[
+   "GPO'lar üzerinde yazma yetkisi olan principaller kontrol edilmiş",
+   "SYSVOL'de GPP cpassword (Groups.xml vb.) kalıntısı taranmış",
+   "GPO link yetkileri (OU seviyesinde) gözden geçirilmiş",
+   "Tier 0 GPO'ları yalnızca DA/Tier0 hesaplarınca düzenlenebiliyor",
+   "Kimlik doğrulamasız SYSVOL erişimi sınırlandırılmış"
+  ],
+  tools:["SharpGPOAbuse","PowerView Get-DomainGPO","Get-GPPPassword","pyGPOAbuse"],
+  cmd:"Get-GPPPassword.py corp/user:pass@dc01\nSharpGPOAbuse.exe --AddComputerTask --GPOName \"Default Policy\" --Command cmd.exe"
+ },
+ {
+  t:"Local Admin İlişkileri", sev:"high",
+  sub:"Yerel yönetici üyelikleri ve lateral hareket",
+  desc:"Aynı yerel admin parolasının paylaşılması (pass-the-hash yayılımı) ve geniş local admin üyelikleri, bir makineden diğerine yatay hareketi kolaylaştırır. BloodHound bu grafiği ortaya koyar.",
+  items:[
+   "Local Admin üyelikleri (AdminTo) BloodHound ile haritalanmış",
+   "Ortak yerel admin parolası kullanımı ortadan kaldırılmış (bkz. LAPS)",
+   "Domain Users gibi geniş gruplar local admin değil",
+   "Tiering modeli: Tier 0/1/2 arası oturum sızması engellenmiş"
+  ],
+  tools:["BloodHound","SharpHound -c LocalAdmin","PsLoggedon","crackmapexec --local-auth"],
+  cmd:"nxc smb 10.0.0.0/24 -u admin -H &lt;hash&gt; --local-auth   <span class='c'># parola paylaşımını test et</span>"
+ },
+ {
+  t:"LAPS", sev:"med",
+  sub:"Local Administrator Password Solution",
+  desc:"LAPS her makinede benzersiz, otomatik dönen yerel admin parolası sağlar. Kurulu değilse ortak parola riski oluşur; kurulu ama okuma izinleri yanlışsa parolalar yetkisiz kişilerce okunabilir.",
+  items:[
+   "LAPS (Legacy veya Windows LAPS) tüm iş istasyonlarında dağıtılmış",
+   "ms-Mcs-AdmPwd / msLAPS-Password okuma izinleri yalnızca yetkili gruplarda",
+   "Parola dönme süresi makul (≤30 gün)",
+   "Kimlerin LAPS parolasını okuyabildiği (ExtendedRight) denetlenmiş"
+  ],
+  tools:["LAPSToolkit","pyLAPS","PowerView Get-DomainObject ms-mcs-admpwd"],
+  cmd:"Get-LAPSPasswords\nnxc ldap dc01 -u user -p pass -M laps"
+ },
+ {
+  t:"gMSA", sev:"med",
+  sub:"Group Managed Service Accounts",
+  desc:"gMSA parolaları AD tarafından yönetilir ve yalnızca yetkili principaller okuyabilir (msDS-GroupMSAMembership). Bu izin yanlışsa gMSA parola blobu (KDS) çekilip hesap ele geçirilir.",
+  items:[
+   "gMSA hesaplarının okuma yetkisi (PrincipalsAllowedToRetrieveManagedPassword) doğru",
+   "Yetkisiz principaller msDS-ManagedPassword okuyamıyor",
+   "Servis hesaplarında mümkünse geleneksel yerine gMSA kullanılıyor",
+   "gMSA'ler ayrıcalıklı gruplarda gereksiz yere değil"
+  ],
+  tools:["gMSADumper.py","GMSAPasswordReader","BloodHound"],
+  cmd:"python gMSADumper.py -u user -p pass -d corp.local"
+ },
+ {
+  t:"Service Accounts", sev:"high",
+  sub:"Servis hesapları &amp; Kerberoasting",
+  desc:"SPN'e sahip kullanıcı hesapları Kerberoasting'e açıktır; TGS bileti çekilip offline kırılabilir. Zayıf parolalı ve yüksek yetkili servis hesapları büyük risktir. AS-REP roasting ise preauth kapalı hesapları hedefler.",
+  items:[
+   "SPN'li hesaplar (Kerberoastable) envanterlenmiş",
+   "Servis hesabı parolaları uzun (25+) ve karmaşık ya da gMSA",
+   "Preauth kapalı (AS-REP roastable) hesaplar düzeltilmiş",
+   "Servis hesapları Domain Admins gibi gruplarda değil (en az ayrıcalık)",
+   "Kerberos şifreleme AES'e yükseltilmiş (RC4 devre dışı)"
+  ],
+  tools:["Rubeus kerberoast","GetUserSPNs.py","GetNPUsers.py","hashcat -m 13100/18200"],
+  cmd:"GetUserSPNs.py corp/user:pass -request -outputfile spns.txt\nhashcat -m 13100 spns.txt wordlist.txt"
+ },
+ {
+  t:"AD CS / Certificate Services", sev:"crit",
+  sub:"Sertifika hizmetleri (ESC1-ESC16)",
+  desc:"Yanlış yapılandırılmış sertifika şablonları ve CA ayarları, düşük yetkili kullanıcının Domain Admin sertifikası talep etmesine (ESC1), NTLM relay ile CA'ya (ESC8) veya sertifika ile kalıcı kimlik ele geçirmeye imkân verir.",
+  items:[
+   "Certipy/Certify ile tüm şablonlar denetlenmiş (ESC1-ESC16)",
+   "ENROLLEE_SUPPLIES_SUBJECT + Client Auth şablonları (ESC1) düzeltilmiş",
+   "CA'da EDITF_ATTRIBUTESUBJECTALTNAME2 (ESC6) kapalı",
+   "Web Enrollment / NDES relay (ESC8/ESC11) engellenmiş, EPA açık",
+   "Zayıf CA erişim kontrolü (ESC7) ve şablon izinleri düzeltilmiş",
+   "Sertifika tabanlı kalıcılık (golden certificate) için CA anahtarı korunuyor"
+  ],
+  tools:["Certipy","Certify.exe","PSPKIAudit","ntlmrelayx --adcs"],
+  cmd:"certipy find -u user@corp.local -p pass -dc-ip 10.0.0.10 -vulnerable\ncertipy req -u user@corp.local -p pass -ca CORP-CA -template ESC1 -upn administrator@corp.local"
+ },
+ {
+  t:"LLMNR / NBT-NS / WPAD", sev:"high",
+  sub:"Broadcast ad çözümleme zehirlenmesi",
+  desc:"LLMNR, NBT-NS ve mDNS ad çözümleme başarısız olduğunda yayın yapar; saldırgan (Responder) sahte yanıt vererek NTLM hash'lerini toplar. WPAD ile de proxy kimlik doğrulaması çalınır. IPv6 için mitm6 aynı işi yapar.",
+  items:[
+   "LLMNR GPO ile kapatılmış (Turn off multicast name resolution)",
+   "NBT-NS (NetBIOS over TCP/IP) devre dışı",
+   "mDNS gerekli değilse kapatılmış",
+   "WPAD DNS'te bloklanmış / GPO ile devre dışı",
+   "IPv6 gerekmiyorsa devre dışı ya da DHCPv6 guard uygulanmış (mitm6)"
+  ],
+  tools:["Responder","Inveigh","mitm6"],
+  cmd:"responder -I eth0 -wv     <span class='c'># hash toplama (yetkili test)</span>\nmitm6 -d corp.local"
+ },
+ {
+  t:"WinRM / RDP / SMB Share Güvenliği", sev:"med",
+  sub:"Uzaktan yönetim ve paylaşım sertleştirme",
+  desc:"Açık RDP (NLA'sız), WinRM ve gevşek SMB paylaşım izinleri hem başlangıç erişimi hem de lateral hareket için kullanılır. Everyone/Authenticated Users yazma izinli paylaşımlar hassas veri sızdırır.",
+  items:[
+   "RDP'de NLA (Network Level Authentication) zorunlu",
+   "WinRM erişimi yalnızca yönetim ağı/hostlarından",
+   "SMB paylaşımlarında Everyone/Anonymous erişimi kaldırılmış",
+   "Erişilebilir paylaşımlar hassas veri (parola dosyaları) için taranmış",
+   "RestrictedAdmin / Remote Credential Guard değerlendirilmiş"
+  ],
+  tools:["nxc smb --shares","Snaffler","PowerHuntShares","evil-winrm"],
+  cmd:"nxc smb 10.0.0.0/24 -u user -p pass --shares\nSnaffler.exe -s -o snaffler.log"
+ },
+ {
+  t:"Privileged Account Hygiene", sep:true, sev:"crit",
+  sub:"Ayrıcalıklı hesap hijyeni &amp; Tiering",
+  desc:"Ayrıcalıklı hesapların iş istasyonlarında oturum açması kimlik bilgisi hırsızlığına (LSASS dump) davetiye çıkarır. Tiering modeli ve PAW (Privileged Access Workstation) ile Tier 0 kimlik bilgileri izole edilmelidir.",
+  items:[
+   "Tier 0 (DA/EA) hesapları yalnızca DC/PAW üzerinde oturum açıyor",
+   "Ayrıcalıklı hesaplar Protected Users grubunda",
+   "Ayrı yönetici hesabı (gündelik hesaptan farklı) kullanılıyor",
+   "Domain/Enterprise Admins üyelikleri minimum ve düzenli gözden geçiriliyor",
+   "krbtgt parolası periyodik (2x) döndürülüyor (Golden Ticket önlemi)",
+   "LSASS koruması (Credential Guard / RunAsPPL) etkin"
+  ],
+  tools:["BloodHound","PingCastle","Purple Knight","PspLoggedon"],
+  cmd:"<span class='c'># Ayrıcalıklı grup üyeliklerini listele</span>\nGet-DomainGroupMember 'Domain Admins' -Recurse | select MemberName"
+ },
+ {
+  t:"Password / Lockout Policy", sev:"med",
+  sub:"Parola ve hesap kilitleme politikası",
+  desc:"Zayıf parola politikası ve kilitleme eşiği yoksa password spraying kolaylaşır. Aksi yönde çok agresif kilitleme ise DoS'a yol açar. Fine-Grained Password Policies (FGPP) ile farklı gruplara ayrı politika uygulanabilir.",
+  items:[
+   "Minimum parola uzunluğu ≥ 14 ve karmaşıklık zorunlu",
+   "Hesap kilitleme eşiği makul (ör. 5-10 deneme) ayarlı",
+   "Fine-Grained Password Policy ayrıcalıklı hesaplara uygulanmış",
+   "Yaygın/sızmış parolalar engelleniyor (banned password list)",
+   "Password spraying tespiti (Event 4625) izleniyor"
+  ],
+  tools:["nxc --pass-pol","Get-ADDefaultDomainPasswordPolicy","kerbrute (spray)"],
+  cmd:"nxc smb dc01 -u user -p pass --pass-pol\nGet-ADDefaultDomainPasswordPolicy"
+ },
+ {
+  t:"Legacy Protocols", sev:"high",
+  sub:"Eski / güvensiz protokoller",
+  desc:"SMBv1, NTLMv1, RC4 Kerberos, LDAP (cleartext), Digest, WDigest (cleartext parola bellekte) gibi eski protokoller hem kırılabilir hem de modern korumaları baypas eder. Bunlar kaldırılmadan sertleştirme eksik kalır.",
+  items:[
+   "SMBv1 tamamen kaldırılmış",
+   "WDigest devre dışı (UseLogonCredential = 0) — cleartext parola bellekte tutulmaz",
+   "Kerberos RC4/DES devre dışı, yalnızca AES",
+   "TLS 1.0/1.1 ve zayıf cipher suite'ler kapatılmış",
+   "Eski OS (Win7/2008) desteği kaldırılmış veya izole edilmiş",
+   "PowerShell v2 (downgrade attack) kaldırılmış"
+  ],
+  tools:["PingCastle","nmap ssl-enum-ciphers","Get-WindowsOptionalFeature"],
+  cmd:"reg query HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest /v UseLogonCredential"
+ }
+];
+
+const list=document.getElementById('list');
+const sevLabel={crit:'Kritik',high:'Yüksek',med:'Orta'};
+const sevClass={crit:'crit',high:'high',med:'med'};
+let allInputs=[];
+
+DATA.forEach((s,i)=>{
+  const card=document.createElement('section');
+  card.className='card';
+  const n=String(i+1).padStart(2,'0');
+  const total=s.items.length;
+  const chips=(s.tools||[]).map(t=>`<span class="chip">${t}</span>`).join('');
+  const items=s.items.map((it,j)=>{
+    const id=`c${i}_${j}`;
+    return `<div class="item"><input type="checkbox" id="${id}" data-key="${id}"><label for="${id}">${it}</label></div>`;
+  }).join('');
+  card.innerHTML=`
+    <div class="chead" tabindex="0" role="button" aria-expanded="false">
+      <span class="num">${n}</span>
+      <div class="ctitle"><h3>${s.t}</h3><p class="sub">${s.sub}</p></div>
+      <span class="mini" data-mini="${i}">0/${total}</span>
+      <span class="sev ${sevClass[s.sev]}">${sevLabel[s.sev]}</span>
+      <span class="chev">▸</span>
+    </div>
+    <div class="body">
+      <p class="desc">${s.desc}</p>
+      ${items}
+      <div class="tools">
+        <p class="lbl">Araçlar</p>
+        <div class="chips">${chips}</div>
+        ${s.cmd?`<pre>${s.cmd}</pre>`:''}
+      </div>
+    </div>`;
+  list.appendChild(card);
+  const head=card.querySelector('.chead');
+  const toggle=()=>{const o=card.classList.toggle('open');head.setAttribute('aria-expanded',o)};
+  head.addEventListener('click',toggle);
+  head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+});
+
+allInputs=[...document.querySelectorAll('.item input')];
+
+/* persistence */
+const STORE='ad-checklist-v1';
+function load(){try{return JSON.parse(localStorage.getItem(STORE))||{}}catch(e){return {}}}
+function save(st){try{localStorage.setItem(STORE,JSON.stringify(st))}catch(e){}}
+let state=load();
+
+function refresh(){
+  let done=0;
+  allInputs.forEach(inp=>{if(inp.checked)done++});
+  const total=allInputs.length;
+  document.getElementById('pfill').style.width=(total?done/total*100:0)+'%';
+  document.getElementById('pcount').textContent=`${done} / ${total}`;
+  DATA.forEach((s,i)=>{
+    let d=0;s.items.forEach((_,j)=>{if(state[`c${i}_${j}`])d++});
+    const m=document.querySelector(`[data-mini="${i}"]`);
+    if(m){m.textContent=`${d}/${s.items.length}`;m.style.color=d===s.items.length&&d>0?'var(--ok)':'';}
+  });
+}
+allInputs.forEach(inp=>{
+  const k=inp.dataset.key;
+  inp.checked=!!state[k];
+  inp.addEventListener('change',()=>{state[k]=inp.checked;save(state);refresh()});
+});
+refresh();
+
+/* controls */
+document.getElementById('expand').addEventListener('click',e=>{
+  const anyClosed=[...document.querySelectorAll('.card')].some(c=>!c.classList.contains('open'));
+  document.querySelectorAll('.card').forEach(c=>{c.classList.toggle('open',anyClosed);c.querySelector('.chead').setAttribute('aria-expanded',anyClosed)});
+  e.target.textContent=anyClosed?'Tümünü Kapat':'Tümünü Aç';
+});
+document.getElementById('reset').addEventListener('click',()=>{
+  if(!confirm('Tüm işaretler silinsin mi?'))return;
+  state={};save(state);allInputs.forEach(i=>i.checked=false);refresh();
+});
+const root=document.documentElement;
+document.getElementById('theme').addEventListener('click',()=>{
+  const cur=root.getAttribute('data-theme');
+  const next=cur==='dark'?'light':cur==='light'?'dark':(matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark');
+  root.setAttribute('data-theme',next);
+});
+</script>
+</body>
+</html>

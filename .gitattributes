@@ -1,0 +1,3 @@
+# Kali/Linux'ta çalışacak scriptler daima LF olmalı
+*.sh   text eol=lf
+*.py   text eol=lf
