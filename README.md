@@ -14,6 +14,7 @@ güvenlik test materyalleri, rehberler ve otomasyon araçları.
 | Dosya | Açıklama |
 |-------|----------|
 | `AD-Ilk-Kesif.html` | Sıfırdan bilgi toplama: Host → Domain → Share → Kullanıcı → Parola → SPN, bol komutlu adım adım rehber. |
+| `AD-Windows-Kontrol.html` | **Windows tarafından** AD keşif & denetim: yerleşik araçlar (net/nltest/ADSI, kurulum yok) → RSAT → PowerView → BloodHound → PingCastle. Kali karşılığı. |
 | `AD-Pentest-Yol-Haritasi.html` | 24 aracın sıralı, öğrenme odaklı rehberi (enumeration → analiz → ileri istismar → raporlama), zengin komut/parametre setleriyle. |
 | `AD-Guvenlik-Checklist.html` | AD güvenlik kontrol listesi. |
 | `ad-pentest-command-center.html` | Pentest komut merkezi. |

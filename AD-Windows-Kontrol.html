@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Directory — Windows'tan Kontrol</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2530; --border:#2b3648;
+    --text:#e6edf3; --muted:#8b98a9; --accent:#58a6ff; --accent2:#7ee787;
+    --warn:#f0883e; --danger:#f85149; --cmd-bg:#0a0e14; --chip:#21324a;
+    --gold:#e3b341;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; padding-bottom:60px;
+  }
+  .wrap{max-width:1150px;margin:0 auto;padding:0 20px}
+
+  header{
+    background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#1a2436 100%);
+    border-bottom:1px solid var(--border); padding:44px 0 34px; text-align:center;
+  }
+  header h1{font-size:2.3rem;letter-spacing:-.5px;margin-bottom:8px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);max-width:780px;margin:0 auto;font-size:1.02rem}
+  .lab-box{
+    display:inline-flex;flex-wrap:wrap;gap:18px;margin-top:22px;
+    background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+    padding:14px 22px;font-family:"Consolas",monospace;font-size:.9rem
+  }
+  .lab-box b{color:var(--accent2)}
+  .lab-box .muted{color:var(--muted)}
+
+  .toc{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:20px 24px; margin:28px 0;
+  }
+  .toc h2{font-size:1rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  .toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .toc-grid a{
+    color:var(--text);text-decoration:none;font-size:.9rem;padding:8px 11px;border-radius:7px;
+    background:var(--panel2);border:1px solid transparent;transition:.15s;display:flex;gap:9px;align-items:center
+  }
+  .toc-grid a:hover{border-color:var(--accent);color:var(--accent)}
+  .toc-grid a .n{color:var(--gold);font-weight:700;font-family:monospace;min-width:22px}
+
+  .mindset{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:24px 26px;margin:28px 0
+  }
+  .mindset h2{margin-bottom:14px;font-size:1.3rem}
+  .mindset h2 .em{color:var(--accent)}
+  .mindset p{color:#c9d3de;margin-bottom:8px}
+  .chain{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-family:monospace;font-size:.86rem
+  }
+  .chain span{
+    background:var(--chip);border:1px solid var(--border);border-radius:20px;padding:5px 13px;color:var(--accent2)
+  }
+  .chain .arrow{background:none;border:none;color:var(--muted);padding:5px 2px}
+
+  .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:16px}
+  .mode{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+  .mode h4{color:var(--gold);font-size:1rem;margin-bottom:6px}
+  .mode p{font-size:.88rem;color:#c9d3de}
+  .mode .tag{display:inline-block;font-size:.7rem;padding:2px 9px;border-radius:12px;background:var(--chip);color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+
+  .step-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    margin:22px 0;overflow:hidden;scroll-margin-top:20px
+  }
+  .step-head{
+    display:flex;align-items:center;gap:14px;padding:18px 24px;
+    background:linear-gradient(90deg,var(--panel2),var(--panel));border-bottom:1px solid var(--border)
+  }
+  .step-head .num{
+    font-family:monospace;font-weight:700;font-size:1.1rem;color:var(--gold);
+    background:var(--chip);border-radius:8px;padding:5px 12px;min-width:44px;text-align:center
+  }
+  .step-head h3{font-size:1.32rem;flex:1}
+  .step-head .badge{
+    font-size:.72rem;padding:3px 10px;border-radius:20px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.5px;background:#1f3a5f;color:#79c0ff
+  }
+  .step-head .badge.def{background:#12281c;color:#7ee787}
+  .step-head .badge.off{background:#3a1f1f;color:#ff9e9e}
+  .step-body{padding:22px 24px}
+  .step-body>p{color:#c9d3de;margin-bottom:10px}
+  .goal{
+    background:#0f2233;border:1px solid #1f4a6d;border-radius:8px;padding:11px 14px;margin:0 0 16px;
+    font-size:.92rem;color:#9fd0ff
+  }
+  .goal::before{content:"🎯 Amaç: ";font-weight:700;color:var(--accent)}
+  .step-body h4{
+    font-size:.82rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);
+    margin:20px 0 8px;display:flex;align-items:center;gap:8px
+  }
+  .step-body h4:first-of-type{margin-top:6px}
+  .toolname{color:var(--gold);font-weight:700}
+  .step-body ul{margin:6px 0 6px 22px;color:#c9d3de}
+  .step-body li{margin:4px 0}
+
+  pre{
+    background:var(--cmd-bg);border:1px solid var(--border);border-left:3px solid var(--accent2);
+    border-radius:8px;padding:14px 16px;overflow-x:auto;margin:8px 0
+  }
+  code{font-family:"Consolas","Courier New",monospace;font-size:.87rem;color:#e6edf3}
+  .cmt{color:#6a7684}
+  .str{color:#a5d6ff}
+  .out{color:#7ee787}
+  .tip{background:#12281c;border:1px solid #1f5133;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.9rem;color:#ade2be}
+  .tip::before{content:"💡 ";}
+  .warnbox{background:#2a1a12;border:1px solid #5c3418;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.9rem;color:#f0c197}
+  .warnbox::before{content:"⚠️ ";}
+  .note{background:var(--panel2);border:1px dashed var(--border);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+  .note b{color:var(--gold)}
+
+  .cheat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;margin:30px 0}
+  .cheat h2{margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--muted);text-transform:uppercase;font-size:.75rem;letter-spacing:.5px}
+  td:first-child{color:var(--accent2);font-weight:600;white-space:nowrap}
+  tr:hover td{background:var(--panel2)}
+
+  footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:40px;padding-top:20px;border-top:1px solid var(--border)}
+  .backtop{
+    position:fixed;bottom:24px;right:24px;background:var(--accent);color:#04101f;
+    width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    text-decoration:none;font-size:1.4rem;box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:50
+  }
+  @media(max-width:600px){header h1{font-size:1.6rem}.step-head h3{font-size:1.05rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1><span>Active Directory</span> — Windows'tan Kontrol</h1>
+    <p>Kali'nin karşılığı: bir <b>Windows makinesinden</b> AD keşfi, güvenlik denetimi ve saldırı yolu analizi nasıl yapılır? Yerleşik araçlardan (kurulum yok) PowerView / SharpHound / PingCastle'a kadar adım adım, komutlarla.</p>
+    <div class="lab-box">
+      <span><span class="muted">Örnek Domain:</span> <b>corp.local</b></span>
+      <span><span class="muted">Örnek Kullanıcı:</span> <b>claire</b></span>
+      <span><span class="muted">Örnek DC:</span> <b>DC01 / 192.168.11.10</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- MINDSET -->
+  <section class="mindset">
+    <h2>Windows'tan bakış: <span class="em">iki ayrı senaryo</span></h2>
+    <p>Kali'de "dışarıdan ağa bağlı bir saldırgansın". Windows'ta ise genelde <b>zaten domain'in içindesin</b> — bu büyük bir avantaj: makine seni Kerberos ile authenticate ettiği için, LDAP'ı hiçbir parola girmeden sorgulayabilirsin. Hangi araçları kullanacağın, aşağıdaki iki durumdan hangisinde olduğuna bağlı.</p>
+    <div class="modes">
+      <div class="mode">
+        <span class="tag">Mod A</span>
+        <h4>Domain'e üye makine + normal kullanıcı</h4>
+        <p>En yaygın lab senaryosu. Windows'un kendi araçlarıyla (ADSI, <code>net</code>, <code>nltest</code>, <code>setspn</code>, <code>dsquery</code>) hiçbir şey kurmadan keşif yaparsın.</p>
+      </div>
+      <div class="mode">
+        <span class="tag">Mod B</span>
+        <h4>RSAT / PowerView / araç kurulabilir</h4>
+        <p>Denetim (audit) veya derin keşif. <code>ActiveDirectory</code> modülü, PowerView, SharpHound→BloodHound, PingCastle ile ACL / delegation / saldırı yolu analizi.</p>
+      </div>
+    </div>
+    <div class="chain" style="margin-top:18px">
+      <span>Ortamı anla</span><span class="arrow">→</span>
+      <span>Kullanıcı & grup</span><span class="arrow">→</span>
+      <span>Bilgisayar & DC</span><span class="arrow">→</span>
+      <span>Zayıf ayar (SPN/PreAuth/Delegation)</span><span class="arrow">→</span>
+      <span>ACL & yol</span><span class="arrow">→</span>
+      <span>Denetim raporu</span>
+    </div>
+    <div class="warnbox" style="margin-top:16px">Bu rehber <b>yalnızca yazılı izin aldığın kendi lab / pentest ortamın</b> içindir. Buradaki komutların çoğu <b>pasif LDAP sorgusudur</b> (non-destructive). PowerView'in <code>Invoke-*</code>, password-spray ve Rubeus gibi aktif adımlar account-lockout / iz bırakma riski taşır — lab dışı kullanma.</div>
+  </section>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Kontrol Adımları</h2>
+    <div class="toc-grid">
+      <a href="#s1"><span class="n">01</span> Ortamı Anla (Domain/DC)</a>
+      <a href="#s2"><span class="n">02</span> Yerleşik Araçlarla Keşif</a>
+      <a href="#s3"><span class="n">03</span> ADSI / PowerShell (kurulum yok)</a>
+      <a href="#s4"><span class="n">04</span> RSAT — AD Modülü</a>
+      <a href="#s5"><span class="n">05</span> PowerView</a>
+      <a href="#s6"><span class="n">06</span> Zayıf Ayar Avı</a>
+      <a href="#s7"><span class="n">07</span> BloodHound / SharpHound</a>
+      <a href="#s8"><span class="n">08</span> PingCastle — Denetim</a>
+      <a href="#cheat"><span class="n">★</span> Hızlı Referans</a>
+    </div>
+  </nav>
+
+  <!-- STEP 1 -->
+  <article class="step-card" id="s1">
+    <div class="step-head"><span class="num">01</span><h3>Ortamı Anla — Domain & DC Tespiti</h3><span class="badge def">Pasif</span></div>
+    <div class="step-body">
+      <div class="goal">Hangi domain'deyim, DC kim, DNS/site yapısı ne? Hiçbir araç kurmadan sadece cmd/PowerShell.</div>
+      <h4>🔧 <span class="toolname">cmd / env</span> — anlık durum</h4>
+      <pre><code><span class="cmt">:: Hangi domain, hangi DC beni authenticate etti?</span>
+echo %USERDOMAIN%      <span class="cmt">:: NETBIOS domain</span>
+echo %USERDNSDOMAIN%   <span class="cmt">:: FQDN (corp.local)</span>
+echo %LOGONSERVER%     <span class="cmt">:: beni logon eden DC (\\DC01)</span>
+whoami /fqdn
+whoami /groups         <span class="cmt">:: üye olduğum gruplar + SID'ler</span>
+whoami /priv           <span class="cmt">:: token üzerindeki ayrıcalıklar</span></code></pre>
+      <h4>🔧 <span class="toolname">nltest</span> — DC / trust keşfi</h4>
+      <pre><code><span class="cmt">:: Domain'in DC'lerini bul</span>
+nltest /dclist:corp.local
+nltest /dsgetdc:corp.local        <span class="cmt">:: en yakın DC + adres + site</span>
+nltest /domain_trusts /all_trusts <span class="cmt">:: domain/forest trust ilişkileri</span></code></pre>
+      <h4>🔧 <span class="toolname">nslookup</span> — DNS ile DC/servis kaydı</h4>
+      <pre><code><span class="cmt">:: Kerberos & LDAP SRV kayıtları = DC listesi</span>
+nslookup -type=SRV _ldap._tcp.dc._msdcs.corp.local
+nslookup -type=SRV _kerberos._tcp.corp.local</code></pre>
+      <div class="tip"><code>%LOGONSERVER%</code> sana anında bir DC verir. Onun IP'sini <code>nslookup DC01.corp.local</code> ile çöz, sonraki tüm sorgularda hedef olarak kullan.</div>
+    </div>
+  </article>
+
+  <!-- STEP 2 -->
+  <article class="step-card" id="s2">
+    <div class="step-head"><span class="num">02</span><h3>Yerleşik Araçlarla Keşif</h3><span class="badge def">Pasif</span></div>
+    <div class="step-body">
+      <div class="goal">Kurulum gerektirmeden kullanıcı, grup, bilgisayar ve SPN listesini çıkar. Her Windows'ta hazır gelen komutlar.</div>
+      <h4>🔧 <span class="toolname">net</span> — hızlı kullanıcı/grup</h4>
+      <pre><code>net user /domain                      <span class="cmt">:: tüm domain kullanıcıları</span>
+net user claire /domain               <span class="cmt">:: tek kullanıcı detay (grup, son parola)</span>
+net group /domain                     <span class="cmt">:: tüm domain grupları</span>
+net group "Domain Admins" /domain     <span class="cmt">:: DA üyeleri — en kritik hedef</span>
+net group "Enterprise Admins" /domain
+net accounts /domain                  <span class="cmt">:: parola politikası & lockout eşiği</span></code></pre>
+      <div class="warnbox"><code>net accounts /domain</code> ile <b>lockout eşiğini</b> öğren. Eşik 3-5 ise password-spray denemeden önce iki kez düşün — hesapları kilitlersin.</div>
+      <h4>🔧 <span class="toolname">dsquery</span> — LDAP sorgusu (varsa)</h4>
+      <pre><code>dsquery user -limit 0                 <span class="cmt">:: tüm kullanıcıların DN'i</span>
+dsquery computer -limit 0             <span class="cmt">:: tüm bilgisayarlar</span>
+dsquery * -filter "(&(objectCategory=user)(servicePrincipalName=*))" -attr samAccountName servicePrincipalName</code></pre>
+      <h4>🔧 <span class="toolname">setspn</span> — Kerberoast adayları</h4>
+      <pre><code>setspn -T corp.local -Q */*           <span class="cmt">:: domaindeki tüm SPN'ler</span>
+setspn -L DC01                        <span class="cmt">:: bir hesabın SPN'leri</span></code></pre>
+      <div class="note"><b>Not:</b> <code>dsquery</code> ve <code>setspn</code>, RSAT / AD-DS rol araçlarıyla gelir; DC'de veya RSAT kurulu makinede hazırdır. Yoksa Mod A'da bir sonraki adımdaki <b>ADSI</b> yöntemini kullan — o her yerde çalışır.</div>
+    </div>
+  </article>
+
+  <!-- STEP 3 -->
+  <article class="step-card" id="s3">
+    <div class="step-head"><span class="num">03</span><h3>ADSI / PowerShell — Kurulum YOK</h3><span class="badge def">Pasif</span></div>
+    <div class="step-body">
+      <div class="goal">Hiçbir modül/araç olmadan, saf .NET ile LDAP sorgusu. Domain'e üye her Windows'ta çalışır — en taşınabilir yöntem.</div>
+      <h4>🔧 <span class="toolname">[adsisearcher]</span> — tek satırlık LDAP</h4>
+      <pre><code><span class="cmt"># Tüm kullanıcılar</span>
+([adsisearcher]"(&(objectCategory=user))").FindAll() |
+  % { $_.Properties.samaccountname }
+
+<span class="cmt"># Tüm bilgisayarlar + işletim sistemi (eski OS = zayıf halka)</span>
+$s = [adsisearcher]"(objectCategory=computer)"
+$s.PropertiesToLoad.AddRange(@("name","operatingsystem"))
+$s.FindAll() | % { "{0,-18} {1}" -f $_.Properties.name, $_.Properties.operatingsystem }
+
+<span class="cmt"># Domain Admins üyeleri</span>
+([adsisearcher]"(&(objectCategory=group)(cn=Domain Admins))").FindOne().Properties.member</code></pre>
+      <h4>🔧 <span class="toolname">Zayıf ayar filtreleri</span> — bit-mask ile</h4>
+      <pre><code><span class="cmt"># Kerberoastable — SPN'i olan kullanıcı hesapları</span>
+([adsisearcher]"(&(objectCategory=user)(servicePrincipalName=*))").FindAll() |
+  % { $_.Properties.samaccountname }
+
+<span class="cmt"># AS-REP roastable — Kerberos pre-auth KAPALI (UAC bit 4194304)</span>
+([adsisearcher]"(&(objectCategory=user)(userAccountControl:1.2.840.113556.1.4.803:=4194304))").FindAll() |
+  % { $_.Properties.samaccountname }
+
+<span class="cmt"># Parola asla eskimeyen hesaplar (UAC bit 65536)</span>
+([adsisearcher]"(&(objectCategory=user)(userAccountControl:1.2.840.113556.1.4.803:=65536))").FindAll() |
+  % { $_.Properties.samaccountname }
+
+<span class="cmt"># Unconstrained delegation'lı bilgisayarlar (UAC bit 524288) — çok kritik</span>
+([adsisearcher]"(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))").FindAll() |
+  % { $_.Properties.name }</code></pre>
+      <div class="tip">Bu dört sorgu tek başına bir mini "güvenlik denetimi"dir. Çıktı boş dönmesi <b>iyi</b>; dolu dönen her satır bir bulgu adayıdır.</div>
+    </div>
+  </article>
+
+  <!-- STEP 4 -->
+  <article class="step-card" id="s4">
+    <div class="step-head"><span class="num">04</span><h3>RSAT — ActiveDirectory Modülü</h3><span class="badge">Kurulum</span></div>
+    <div class="step-body">
+      <div class="goal">Microsoft'un resmi denetim aracı. En temiz, en "meşru görünen" keşif — Get-AD* cmdlet'leri.</div>
+      <h4>🔧 <span class="toolname">Kurulum</span> (yönetici PowerShell)</h4>
+      <pre><code><span class="cmt"># Windows 10/11 istemci</span>
+Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
+<span class="cmt"># Windows Server</span>
+Install-WindowsFeature RSAT-AD-PowerShell
+Import-Module ActiveDirectory</code></pre>
+      <h4>🔧 <span class="toolname">Get-AD*</span> — çekirdek keşif</h4>
+      <pre><code>Get-ADDomain                          <span class="cmt"># domain SID, mode, DC, FSMO</span>
+Get-ADForest
+Get-ADDomainController -Filter *
+
+<span class="cmt"># Kullanıcılar + kritik alanlar</span>
+Get-ADUser -Filter * -Properties LastLogonDate,PasswordLastSet,Enabled |
+  select SamAccountName,Enabled,LastLogonDate,PasswordLastSet | ft -Auto
+
+<span class="cmt"># Ayrıcalıklı grup üyeleri (recursive)</span>
+Get-ADGroupMember "Domain Admins" -Recursive | select name,SamAccountName
+Get-ADGroupMember "Enterprise Admins" -Recursive
+
+<span class="cmt"># Parola politikası</span>
+Get-ADDefaultDomainPasswordPolicy
+Get-ADFineGrainedPasswordPolicy -Filter *</code></pre>
+      <h4>🔧 <span class="toolname">Zayıf ayar sorguları</span></h4>
+      <pre><code>Get-ADUser -Filter {ServicePrincipalName -like "*"} -Properties ServicePrincipalName   <span class="cmt"># Kerberoast</span>
+Get-ADUser -Filter {DoesNotRequirePreAuth -eq $true}                                    <span class="cmt"># AS-REP</span>
+Get-ADUser -Filter {PasswordNeverExpires -eq $true}
+Get-ADComputer -Filter {TrustedForDelegation -eq $true} -Properties TrustedForDelegation <span class="cmt"># unconstrained</span>
+<span class="cmt"># Constrained delegation</span>
+Get-ADObject -Filter {msDS-AllowedToDelegateTo -like "*"} -Properties msDS-AllowedToDelegateTo</code></pre>
+    </div>
+  </article>
+
+  <!-- STEP 5 -->
+  <article class="step-card" id="s5">
+    <div class="step-head"><span class="num">05</span><h3>PowerView — Derin Keşif</h3><span class="badge off">Yarı-aktif</span></div>
+    <div class="step-body">
+      <div class="goal">RSAT'ın göremediği şeyleri gör: ACL'ler, GPO, oturum açan kullanıcılar, güven ilişkileri, delegation. Pentest'in Windows'taki İsviçre çakısı.</div>
+      <h4>🔧 <span class="toolname">Yükleme</span></h4>
+      <pre><code><span class="cmt"># PowerSploit / PowerView (lab: bloke edilirse AMSI/ExecutionPolicy)</span>
+powershell -ep bypass
+Import-Module .\PowerView.ps1
+<span class="cmt"># veya: IEX (Get-Content .\PowerView.ps1 -Raw)</span></code></pre>
+      <h4>🔧 <span class="toolname">Domain / kullanıcı / bilgisayar</span></h4>
+      <pre><code>Get-Domain ; Get-DomainController ; Get-DomainPolicy
+Get-DomainUser -Properties samaccountname,description,memberof
+Get-DomainUser -SPN               <span class="cmt"># Kerberoast adayları</span>
+Get-DomainUser -PreauthNotRequired <span class="cmt"># AS-REP adayları</span>
+Get-DomainComputer -Unconstrained  <span class="cmt"># unconstrained delegation</span>
+Get-DomainComputer -TrustedToAuth  <span class="cmt"># constrained delegation</span></code></pre>
+      <h4>🔧 <span class="toolname">ACL & saldırı yolu</span> — asıl değer burada</h4>
+      <pre><code><span class="cmt"># "Kim kimin üzerinde tehlikeli hak sahibi?" (GenericAll, WriteDacl, ...)</span>
+Find-InterestingDomainAcl -ResolveGUIDs |
+  ? { $_.IdentityReferenceName -notmatch 'Domain Admins|Enterprise' } |
+  select IdentityReferenceName,ActiveDirectoryRights,ObjectDN
+
+<span class="cmt"># Belirli bir kullanıcının domaindeki tüm hakları</span>
+Get-DomainObjectAcl -Identity "Domain Admins" -ResolveGUIDs</code></pre>
+      <h4>🔧 <span class="toolname">Oturum / erişim avı</span></h4>
+      <pre><code>Find-DomainUserLocation            <span class="cmt"># DA hangi makinede oturum açmış?</span>
+Find-LocalAdminAccess              <span class="cmt"># benim local admin olduğum makineler</span>
+Invoke-ShareFinder -CheckShareAccess</code></pre>
+      <div class="warnbox"><code>Find-DomainUserLocation</code>, <code>Invoke-ShareFinder</code> gibi komutlar ağdaki onlarca makineye <b>bağlanır</b> — gürültü yapar ve EDR tetikler. Lab'da serbest, ama gerçek işte scope/timing'e dikkat.</div>
+    </div>
+  </article>
+
+  <!-- STEP 6 -->
+  <article class="step-card" id="s6">
+    <div class="step-head"><span class="num">06</span><h3>Zayıf Ayar Avı — Kontrol Listesi</h3><span class="badge def">Pasif</span></div>
+    <div class="step-body">
+      <div class="goal">Bir denetimde "bulgu" olarak yazacağın klasik AD zayıflıkları ve Windows'tan tespit komutları.</div>
+      <ul>
+        <li><b>Kerberoasting</b> — servis hesabında SPN + zayıf parola → <code>Get-DomainUser -SPN</code></li>
+        <li><b>AS-REP Roasting</b> — pre-auth kapalı hesap → <code>Get-DomainUser -PreauthNotRequired</code></li>
+        <li><b>Unconstrained Delegation</b> — DC dışı makinede açıksa kritik → <code>Get-DomainComputer -Unconstrained</code></li>
+        <li><b>PasswordNeverExpires / eski/boş parola</b> → <code>Get-ADUser -Filter {PasswordNeverExpires -eq $true}</code></li>
+        <li><b>LAPS yok</b> — yerel admin parolası her yerde aynı → <code>Get-ADComputer -Filter * -Properties ms-Mcs-AdmPwd</code> (erişebiliyorsan sorun)</li>
+        <li><b>Tehlikeli ACL</b> — normal kullanıcıda GenericAll/WriteDacl → <code>Find-InterestingDomainAcl</code></li>
+        <li><b>SYSVOL cpassword (GPP)</b> — eski Group Policy Preferences parolası:</li>
+      </ul>
+      <pre><code><span class="cmt"># SYSVOL'de saklanmış (kırılabilir) GPP parolası ara</span>
+findstr /S /I cpassword \\corp.local\sysvol\corp.local\policies\*.xml</code></pre>
+      <div class="tip">Her bulgu için üç şey not al: <b>Kanıt</b> (komut çıktısı), <b>Risk</b> (ne mümkün oluyor), <b>Düzeltme</b>. Repo'daki <code>ad-pentest-rapor-sablonu.html</code> tam bu formatta.</div>
+    </div>
+  </article>
+
+  <!-- STEP 7 -->
+  <article class="step-card" id="s7">
+    <div class="step-head"><span class="num">07</span><h3>BloodHound / SharpHound</h3><span class="badge off">Yarı-aktif</span></div>
+    <div class="step-body">
+      <div class="goal">Tüm domain'i grafik olarak topla; "buradan Domain Admin'e giden en kısa yol nedir?" sorusunu görselleştir.</div>
+      <h4>🔧 <span class="toolname">SharpHound</span> — toplama (Windows'tan)</h4>
+      <pre><code><span class="cmt"># Exe ile</span>
+SharpHound.exe -c All --zipfilename corp_bh
+<span class="cmt"># PowerShell portu ile</span>
+Import-Module .\SharpHound.ps1
+Invoke-BloodHound -CollectionMethod All -OutputPrefix corp_bh
+<span class="cmt"># Daha sessiz: sadece DC'den LDAP, oturum toplamayı azalt</span>
+SharpHound.exe -c DCOnly --zipfilename corp_dconly</code></pre>
+      <h4>🔧 <span class="toolname">BloodHound</span> — analiz</h4>
+      <ul>
+        <li>Üretilen <code>.zip</code>'i BloodHound GUI'ye sürükle.</li>
+        <li>Hazır sorgular: <b>Shortest Paths to Domain Admins</b>, <b>Find Principals with DCSync Rights</b>, <b>Kerberoastable Users</b>.</li>
+        <li>Kendi kullanıcını "başlangıç" işaretle → "Shortest path to Domain Admins" ile yolunu gör.</li>
+      </ul>
+      <div class="note"><b>DCOnly vs All:</b> <code>DCOnly</code> sadece DC'ye LDAP atar, session/loggedon toplamaz → çok daha sessiz ama yol analizi zayıflar. Lab'da <code>All</code>, gerçek ortamda önce <code>DCOnly</code> mantıklı.</div>
+    </div>
+  </article>
+
+  <!-- STEP 8 -->
+  <article class="step-card" id="s8">
+    <div class="step-head"><span class="num">08</span><h3>PingCastle — Denetim Raporu</h3><span class="badge def">Pasif</span></div>
+    <div class="step-body">
+      <div class="goal">Saldırgan değil <b>denetçi</b> gözüyle: domain'in güvenlik skorunu ve somut zayıflıklarını tek HTML raporda çıkar. Yönetime sunmak için ideal.</div>
+      <h4>🔧 <span class="toolname">PingCastle</span></h4>
+      <pre><code><span class="cmt"># Etkileşimli menü</span>
+PingCastle.exe
+<span class="cmt"># Doğrudan healthcheck (HTML + XML rapor üretir)</span>
+PingCastle.exe --healthcheck --server corp.local
+<span class="cmt"># Sadece belirli DC</span>
+PingCastle.exe --healthcheck --server DC01.corp.local</code></pre>
+      <ul>
+        <li>Çıktı: <code>ad_hc_corp.local.html</code> — risk skoru (Stale Objects, Privileged Accounts, Trusts, Anomalies).</li>
+        <li>Her bulguda <b>puan + açıklama + düzeltme</b> hazır gelir; rapora doğrudan taşınır.</li>
+        <li>Tamamen LDAP okuma tabanlı → non-destructive, lockout riski yok.</li>
+      </ul>
+      <div class="tip">Bir lab denetiminde sıralaman: <b>PingCastle</b> (genel skor) → <b>BloodHound</b> (somut yollar) → <b>PowerView</b> (tek tek doğrulama ve kanıt). Üçü birbirini tamamlar.</div>
+    </div>
+  </article>
+
+  <!-- CHEAT -->
+  <section class="cheat" id="cheat">
+    <h2>★ Hızlı Referans — Windows AD Kontrol</h2>
+    <table>
+      <thead><tr><th>Ne istiyorum?</th><th>Komut (kurulum yok / ADSI-net)</th><th>Komut (RSAT / PowerView)</th></tr></thead>
+      <tbody>
+        <tr><td>Domain & DC</td><td><code>nltest /dsgetdc:corp.local</code></td><td><code>Get-ADDomain</code></td></tr>
+        <tr><td>Tüm kullanıcılar</td><td><code>net user /domain</code></td><td><code>Get-ADUser -Filter *</code></td></tr>
+        <tr><td>Domain Admins</td><td><code>net group "Domain Admins" /domain</code></td><td><code>Get-ADGroupMember "Domain Admins" -Recursive</code></td></tr>
+        <tr><td>Bilgisayarlar + OS</td><td><code>[adsisearcher]"(objectCategory=computer)"</code></td><td><code>Get-ADComputer -Filter * -Properties OperatingSystem</code></td></tr>
+        <tr><td>Parola politikası</td><td><code>net accounts /domain</code></td><td><code>Get-ADDefaultDomainPasswordPolicy</code></td></tr>
+        <tr><td>Kerberoast adayı</td><td><code>setspn -T corp.local -Q */*</code></td><td><code>Get-DomainUser -SPN</code></td></tr>
+        <tr><td>AS-REP adayı</td><td><code>...(userAccountControl:...=4194304)</code></td><td><code>Get-DomainUser -PreauthNotRequired</code></td></tr>
+        <tr><td>Unconstrained deleg.</td><td><code>...(userAccountControl:...=524288)</code></td><td><code>Get-DomainComputer -Unconstrained</code></td></tr>
+        <tr><td>Tehlikeli ACL</td><td>—</td><td><code>Find-InterestingDomainAcl -ResolveGUIDs</code></td></tr>
+        <tr><td>DA'ya giden yol</td><td>—</td><td>SharpHound → BloodHound</td></tr>
+        <tr><td>Genel güvenlik skoru</td><td>—</td><td><code>PingCastle.exe --healthcheck</code></td></tr>
+        <tr><td>GPP cpassword</td><td><code>findstr /S /I cpassword \\corp.local\sysvol\...\*.xml</code></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    AD Lab — Windows'tan Kontrol · Yalnızca yetkili laboratuvar / pentest ortamları için · Non-destructive öncelikli
+  </footer>
+</div>
+
+<a href="#" class="backtop" title="Yukarı">↑</a>
+</body>
+</html>
