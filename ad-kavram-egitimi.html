@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD Concept Academy</title>
+<style>
+:root{
+  --bg:#0a0e14; --bg2:#0d131c; --panel:#111926; --panel2:#16212f; --line:#213040;
+  --line2:#2c3f52; --ink:#e7eef5; --ink2:#a7bacc; --ink3:#6d8096;
+  --accent:#38bdf8; --accent2:#22d3ee; --accdim:#0d3547;
+  --ok:#34d399; --okdim:#0e3628; --warn:#fbbf24; --warndim:#3a300c;
+  --crit:#f87171; --critdim:#3a1616; --info:#818cf8; --infodim:#20234a;
+  --purple:#a78bfa;
+  --mono:'Cascadia Code','JetBrains Mono','Consolas','SFMono-Regular',ui-monospace,monospace;
+  --sans:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --sb:256px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.65;
+  background-image:radial-gradient(1100px 560px at 88% -8%,#0e2233 0,transparent 55%),radial-gradient(820px 460px at -8% 108%,#151033 0,transparent 50%);
+  background-attachment:fixed}
+h1,h2,h3,h4{margin:0;line-height:1.25;font-weight:700}
+code,kbd,pre{font-family:var(--mono)}
+::selection{background:var(--accent);color:#04121b}
+
+.app{display:grid;grid-template-columns:var(--sb) 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:linear-gradient(180deg,#0c121b,#090d13);
+  border-right:1px solid var(--line);display:flex;flex-direction:column}
+.sb-head{padding:16px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:11px;align-items:center}
+.logo{width:40px;height:40px;flex:none;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#0d3547,#1a1440);border:1px solid var(--line2)}
+.logo svg{width:23px;height:23px}
+.brand h1{font-size:14.5px}
+.brand .sub{font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.progmini{display:flex;align-items:center;gap:9px;margin-top:13px}
+.pbar{flex:1;height:7px;background:var(--line);border-radius:20px;overflow:hidden}
+.pbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--purple));transition:.3s}
+.progmini b{font-family:var(--mono);font-size:11px;color:var(--accent2)}
+.nav{padding:8px;display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;color:var(--ink2);text-decoration:none;font-size:13px;transition:.13s}
+.nav a:hover{background:var(--panel);color:var(--ink)}
+.nav a.active{background:var(--accdim);color:#c6efff}
+.nav a .ic{width:20px;flex:none;text-align:center;font-size:14px}
+.nav a .done{margin-left:auto;color:var(--ok);opacity:0;font-size:11px}
+.nav a.visited .done{opacity:1}
+.nav a .n{font-family:var(--mono);font-size:10px;color:var(--ink3);width:16px;flex:none}
+
+.main{min-width:0;padding:0 0 120px}
+.topbar{display:flex;align-items:center;gap:12px;padding:13px 34px;position:sticky;top:0;z-index:20;
+  background:rgba(10,14,20,.82);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+.topbar .mburg{display:none;background:var(--panel);border:1px solid var(--line2);color:var(--ink);border-radius:8px;padding:7px 11px;cursor:pointer}
+.topbar h2{font-size:15px}
+.topbar .spacer{flex:1}
+.topbar .nextbtn{background:var(--accdim);border:1px solid #14455c;color:#c6efff;font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;cursor:pointer}
+.topbar .nextbtn:hover{background:#124257}
+.wrap{max-width:1000px;padding:28px 34px 0}
+
+section.view{display:none}
+section.view.active{display:block}
+.vhead .eye{font-family:var(--mono);font-size:11px;letter-spacing:1.6px;color:var(--accent2);text-transform:uppercase}
+.vhead h3{font-size:27px;margin:8px 0 8px;letter-spacing:-.4px}
+.vhead .lead{color:var(--ink2);font-size:15.5px;max-width:72ch}
+.prose{color:var(--ink2)}
+.prose p{margin:13px 0}
+.prose b{color:var(--ink)}
+.prose ul{margin:10px 0;padding-left:20px}.prose li{margin:6px 0}
+.term{color:var(--accent);font-weight:600;border-bottom:1px dotted var(--accent2);cursor:help}
+
+.subh{font-family:var(--mono);color:var(--accent);text-transform:uppercase;letter-spacing:.7px;font-size:13px;margin:30px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.subh::before{content:"▚";color:var(--accent2);font-size:11px}
+
+figure{margin:18px 0;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px 16px 12px;overflow:hidden}
+figure svg{max-width:100%;height:auto;display:block;margin:0 auto;color:var(--ink2)}
+figcaption{color:var(--ink3);font-size:12.5px;margin-top:10px;text-align:center;font-style:italic}
+
+/* sequence diagram */
+.seqstep{opacity:.22;transition:opacity .25s}
+.seqstep.seen{opacity:.5}
+.seqstep.active{opacity:1}
+.seqstep .sl{stroke:currentColor;stroke-width:1.6;fill:none}
+.seqstep .lbl{fill:var(--ink2);font-size:12px;font-family:var(--mono)}
+.seqstep.active .sl{stroke:var(--accent);stroke-width:2.6}
+.seqstep.active .lbl{fill:#c6efff}
+.seqstep.active .ah{fill:var(--accent)}
+.seqstep .ah{fill:currentColor}
+.seqstep.vuln.active .sl{stroke:var(--crit)}
+.seqstep.vuln.active .lbl{fill:#ffc9c9}
+.seqstep.vuln.active .ah{fill:var(--crit)}
+.actorbox{fill:var(--panel2);stroke:var(--line2)}
+.actorlbl{fill:var(--ink);font-size:13px;font-weight:600;font-family:var(--sans);text-anchor:middle}
+.lifeline{stroke:var(--line2);stroke-width:1.4;stroke-dasharray:4 5}
+.vulnmark{fill:var(--crit);font-size:14px;font-weight:800}
+
+.player{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.player button{background:var(--panel2);border:1px solid var(--line2);color:var(--ink);border-radius:9px;padding:8px 14px;cursor:pointer;font-family:var(--mono);font-size:12px}
+.player button:hover{border-color:var(--accent);color:var(--accent)}
+.player button:disabled{opacity:.35;cursor:default}
+.player .cnt{font-family:var(--mono);font-size:12px;color:var(--ink3)}
+.player .play{background:var(--accdim);border-color:#14455c;color:#c6efff}
+.expbox{border:1px solid var(--line2);border-radius:11px;padding:14px 16px;margin-top:12px;background:var(--bg2);min-height:64px}
+.expbox .stepname{font-family:var(--mono);font-size:11px;color:var(--accent2);letter-spacing:.5px;text-transform:uppercase}
+.expbox .stepnote{margin-top:6px;font-size:13.5px;color:var(--ink2)}
+.expbox.vuln{border-color:#5a2222;background:var(--critdim)}
+.expbox .vulnrow{margin-top:10px;padding-top:10px;border-top:1px dashed #5a2222;font-size:13px;color:#ffc9c9}
+.expbox .vulnrow b{color:#ff9d9d}
+.expbox .atk{display:inline-block;font-family:var(--mono);font-size:10px;background:#5a2222;color:#ffb3b3;padding:2px 8px;border-radius:20px;margin-left:6px}
+
+.why{border:1px solid #5a2222;background:var(--critdim);border-radius:12px;padding:14px 16px;margin:14px 0}
+.why .wt{font-family:var(--mono);font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#ff9d9d;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.why .wt b{color:#fff}
+.why p{margin:6px 0;color:#ffd4d4;font-size:13.5px}
+.why .fix{margin-top:9px;padding-top:9px;border-top:1px dashed #5a2222;color:#b9f3da;font-size:12.8px}
+.why .fix b{color:#6ee7b7}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:14px 0}
+.ccard{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel)}
+.ccard h4{font-size:14.5px;margin-bottom:6px;color:var(--accent)}
+.ccard p{margin:6px 0;font-size:13px;color:var(--ink2)}
+.ccard .tag{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3)}
+
+.callout{border-radius:11px;padding:13px 15px;margin:14px 0;font-size:13.5px;border:1px solid;display:flex;gap:10px}
+.callout .i{flex:none;font-weight:800}
+.callout.info{background:var(--infodim);border-color:#33386b;color:#c7cbff}
+.callout.ok{background:var(--okdim);border-color:#1c5a44;color:#b9f3da}
+.callout.warn{background:var(--warndim);border-color:#5a4a18;color:#ffe6a3}
+.callout b{color:#fff}
+
+.tblwrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:640px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--panel2);font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink3)}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:rgba(56,189,248,.04)}
+td .mono{font-family:var(--mono);color:var(--accent2)}
+
+.glossary{display:grid;gap:8px;margin:14px 0}
+.gitem{border:1px solid var(--line);border-radius:11px;padding:12px 15px;background:var(--panel)}
+.gitem dt{font-family:var(--mono);color:var(--accent);font-size:13.5px;font-weight:600}
+.gitem dd{margin:5px 0 0;color:var(--ink2);font-size:13px}
+.gitem dd .en{color:var(--ink3);font-style:italic}
+
+/* quiz */
+.quiz{border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin:14px 0;background:var(--panel)}
+.quiz .qn{font-family:var(--mono);font-size:11px;color:var(--accent2)}
+.quiz .qq{font-size:15px;font-weight:600;margin:6px 0 12px}
+.quiz .opt{display:block;padding:10px 13px;border:1px solid var(--line2);border-radius:9px;margin:6px 0;cursor:pointer;font-size:13.5px;color:var(--ink2);transition:.12s}
+.quiz .opt:hover{border-color:var(--accent)}
+.quiz .opt.sel{border-color:var(--accent);background:var(--accdim)}
+.quiz .opt.correct{border-color:var(--ok);background:var(--okdim);color:#b9f3da}
+.quiz .opt.wrong{border-color:var(--crit);background:var(--critdim);color:#ffc9c9}
+.quiz .exp{margin-top:10px;padding:11px 13px;border-radius:9px;background:var(--bg2);border:1px solid var(--line2);font-size:13px;color:var(--ink2);display:none}
+.quiz .exp.show{display:block}
+.quizbar{display:flex;align-items:center;gap:14px;margin:16px 0}
+.quizbar button{background:var(--accdim);border:1px solid #14455c;color:#c6efff;font-family:var(--mono);font-size:13px;padding:10px 18px;border-radius:9px;cursor:pointer}
+.scoreb{font-family:var(--mono);font-size:15px;color:var(--accent2)}
+
+@media(max-width:900px){
+  :root{--sb:0px}
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;z-index:60;width:262px;left:0;transform:translateX(-100%);transition:.25s}
+  .sidebar.show{transform:none}
+  .topbar .mburg{display:block}
+  .wrap{padding:22px 16px 0}
+  .topbar{padding:12px 16px}
+  .vhead h3{font-size:22px}
+}
+.scrim{display:none}
+@media(max-width:900px){.scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="brand">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6a2 2 0 012-2h11l3 3v12.5"/><path d="M8 8h6M8 12h8M8 16h5"/></svg></div>
+        <div><h1>AD Concept Academy</h1><div class="sub">Kavram Eğitimi · Neden Zafiyet?</div></div>
+      </div>
+      <div class="progmini"><div class="pbar"><span id="pbar"></span></div><b id="ppct">0%</b></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main">
+    <div class="topbar">
+      <button class="mburg" id="mburg">☰</button>
+      <h2 id="topTitle">Genel Bakış</h2>
+      <div class="spacer"></div>
+      <button class="nextbtn" id="nextBtn">Sonraki modül →</button>
+    </div>
+    <div class="wrap"><div id="views"></div></div>
+  </main>
+</div>
+
+<script>
+/* =====================================================================
+   AD CONCEPT ACADEMY — Kerberos / NTLM / LDAP / Delegation
+   Türkçe anlatım + İngilizce teknik terim. Sekans diyagramlı, interaktif.
+   Standalone, offline. localStorage ile ilerleme.
+   ===================================================================== */
+
+/* ---------- Sequence diagram builder (inline SVG, no script inside svg) ---------- */
+function seqSVG(id,actors,steps){
+  const n=actors.length, marginX=120, laneGap=(740-marginX*2)/(n-1||1);
+  const laneX=actors.map((_,i)=>marginX+i*laneGap);
+  const W=740, topBoxY=24, boxH=34, lifeTop=topBoxY+boxH, startY=lifeTop+40, stepGap=58;
+  const H=startY+steps.length*stepGap+10;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${actors.join(', ')} arasındaki kimlik doğrulama mesaj akışı">`;
+  // actor boxes + lifelines
+  actors.forEach((a,i)=>{
+    const x=laneX[i];
+    s+=`<rect class="actorbox" x="${x-70}" y="${topBoxY}" width="140" height="${boxH}" rx="8"/>`;
+    s+=`<text class="actorlbl" x="${x}" y="${topBoxY+22}">${a}</text>`;
+    s+=`<line class="lifeline" x1="${x}" y1="${lifeTop}" x2="${x}" y2="${H-8}"/>`;
+  });
+  // steps
+  steps.forEach((st,i)=>{
+    const y=startY+i*stepGap, x1=laneX[st.from], x2=laneX[st.to];
+    const cls='seqstep'+(st.vuln?' vuln':'');
+    s+=`<g class="${cls}" data-idx="${i}">`;
+    if(st.from===st.to){
+      const bx=x1+8;
+      s+=`<path class="sl" d="M${x1} ${y} h60 v18 h-52"/>`;
+      s+=`<polygon class="ah" points="${x1+12},${y+18-4} ${x1},${y+18} ${x1+12},${y+18+4}"/>`;
+      s+=`<text class="lbl" x="${bx+2}" y="${y-6}">${st.label}</text>`;
+    }else{
+      const dir=x2>x1?1:-1, hx=x2-dir*7;
+      s+=`<line class="sl" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
+      s+=`<polygon class="ah" points="${x2},${y} ${hx},${y-5} ${hx},${y+5}"/>`;
+      const mid=(x1+x2)/2;
+      s+=`<text class="lbl" x="${mid}" y="${y-7}" text-anchor="middle">${st.label}</text>`;
+    }
+    if(st.vuln)s+=`<text class="vulnmark" x="${Math.max(x1,x2)+12}" y="${y+4}">⚠</text>`;
+    s+=`</g>`;
+  });
+  s+=`</svg>`;
+  return s;
+}
+function diagramBlock(d){
+  const svg=seqSVG(d.id,d.actors,d.steps);
+  return `<figure><div id="svgwrap-${d.id}">${svg}</div>
+    <div class="player" data-diag="${d.id}">
+      <button class="pv" data-act="prev">◀ Geri</button>
+      <button class="play" data-act="play">▶ Baştan oynat</button>
+      <button class="pv" data-act="next">İleri ▶</button>
+      <span class="cnt" id="cnt-${d.id}">Adım 1 / ${d.steps.length}</span>
+    </div>
+    <div class="expbox" id="exp-${d.id}"></div>
+    <figcaption>${d.cap}</figcaption></figure>`;
+}
+
+/* ---------- Content ---------- */
+const SECTIONS=[];
+function SEC(id,icon,title,eye,html){SECTIONS.push({id,icon,title,eye,html})}
+
+/* 1 — Genel Bakış */
+SEC('overview','◆','Genel Bakış','NEDEN AD BİR HEDEF',`
+<div class="vhead"><div class="eye">NEDEN AD BİR HEDEF</div><h3>Active Directory Neden Saldırının Merkezi?</h3>
+<p class="lead">AD, bir kurumun <b>kimlik ve yetki beynidir</b>: kim kimdir, kim neye erişebilir hepsi burada tutulur. Bir saldırgan tek bir bilgisayarı değil, <b>domain’in tamamını</b> ele geçirmeyi hedefler — çünkü Domain Admin olmak, kurumdaki her makineye tanrı erişimi demektir.</p></div>
+<div class="subh">Büyük Resim</div>
+<div class="prose"><p>AD üç şeyi bir arada yapar ve her biri ayrı bir saldırı yüzeyi doğurur:</p>
+<ul>
+<li><b>Dizin (LDAP):</b> tüm kullanıcı, grup, bilgisayar ve izinlerin veritabanı → <b>bilgi toplama</b> buradan.</li>
+<li><b>Kimlik doğrulama (NTLM & Kerberos):</b> "sen gerçekten sen misin" → <b>kimlik hırsızlığı / relay</b> buradan.</li>
+<li><b>Yetki (ACL, gruplar, delegation):</b> "sen neye dokunabilirsin" → <b>yetki yükseltme yolları</b> buradan.</li>
+</ul>
+<p>Bu panelin mantığı basit: her mekanizmanın <b>nasıl çalıştığını</b> gör, sonra <b>hangi tasarım kararının</b> onu zafiyete çevirdiğini anla. Zafiyet çoğu zaman bir "bug" değil, <b>yanlış yapılandırılmış bir özelliktir</b>.</p></div>
+<div class="callout info"><span class="i">ℹ</span><div>Örnek evrenimiz: domain <b>example.local</b>, DC <b>DC01</b>, kullanıcı <b>ahmet</b>, servis hesabı <b>svc_sql</b>. Tüm diyagramlar bu evreni kullanır.</div></div>
+<div class="callout warn"><span class="i">⚠</span><div>Buradaki her teknik yalnızca <b>yetkilendirilmiş test</b> ve <b>kendi lab’in</b> içindir. Amaç savunmayı anlamak; kavramı bilen savunmayı da kurar.</div></div>`);
+
+/* 2 — Nesne Modeli */
+SEC('objects','▤','AD Nesne Modeli','THE BUILDING BLOCKS',`
+<div class="vhead"><div class="eye">THE BUILDING BLOCKS</div><h3>AD Nesne Modeli: Domain, Nesneler, Gruplar, ACL</h3>
+<p class="lead">Saldırı yollarını görebilmek için önce oyun tahtasını tanı: AD her şeyi bir <b>nesne (object)</b> olarak tutar ve her nesnenin bir <b>güvenlik tanımlayıcısı (SID)</b> ile bir <b>izin listesi (ACL)</b> vardır.</p></div>
+<div class="subh">Temel Kavramlar</div>
+<div class="cards">
+<div class="ccard"><div class="tag">yapı</div><h4>Domain & Forest</h4><p>Domain = tek bir yönetim sınırı (example.local). Forest = bir veya çok domainin güven ağacı. Forest, güvenin en dış sınırıdır.</p></div>
+<div class="ccard"><div class="tag">sunucu</div><h4>Domain Controller (DC)</h4><p>Dizinin kopyasını tutan ve kimlik doğrulayan sunucu. DC’yi ele geçiren domain’i ele geçirir.</p></div>
+<div class="ccard"><div class="tag">nesne</div><h4>User / Computer</h4><p>Her kullanıcı ve her bilgisayar bir hesaptır. Bilgisayarların da parolası (machine account) vardır.</p></div>
+<div class="ccard"><div class="tag">gruplama</div><h4>OU & Group</h4><p>OU = organizasyon/GPO uygulama kabı. Group = yetki toplama aracı (örn. Domain Admins).</p></div>
+<div class="ccard"><div class="tag">kimlik</div><h4>SID</h4><p>Her nesnenin benzersiz güvenlik kimliği. İzinler isme değil SID’e bağlıdır (SID history saldırıları buradan).</p></div>
+<div class="ccard"><div class="tag">yetki</div><h4>ACL / ACE</h4><p>Bir nesneye "kim ne yapabilir" listesi. Yanlış bir ACE (GenericAll vb.) doğrudan ele geçirme yoludur.</p></div>
+</div>
+<div class="subh">Neden Önemli — Nested Groups</div>
+<div class="prose"><p>Gruplar iç içe olabilir: <b>ahmet → Helpdesk → Server Admins → Domain Admins</b>. ahmet doğrudan Domain Admin görünmez ama <b>etkin olarak</b> Domain Admin’dir. BloodHound tam da bu gizli zincirleri bulmak için vardır.</p></div>
+<div class="why"><div class="wt">⚠ NEDEN ZAFİYET — <b>Aşırı yetki & gizli üyelik</b></div>
+<p>İzinler SID tabanlı ve devralınabilir olduğu için, düşük yetkili bir hesap zincirleme üyelik veya tek bir yanlış ACE üzerinden Domain Admin’e ulaşabilir. Kimse "ahmet DA’dır" demez; yol <b>ilişkiler içinde saklıdır</b>.</p>
+<div class="fix"><b>Savunma:</b> tiered admin modeli, gereksiz grup üyeliklerinin temizliği, ACL denetimi, ayrıcalıklı grupların düzenli gözden geçirilmesi.</div></div>`);
+
+/* 3 — LDAP */
+SEC('ldap','◧','LDAP','THE DIRECTORY',`
+<div class="vhead"><div class="eye">THE DIRECTORY</div><h3>LDAP: Dizinin Okunması</h3>
+<p class="lead">LDAP, AD veritabanına sorulan sorgu dilidir. Kullanıcılar, gruplar, izinler, delegation bayrakları — hepsi LDAP ile okunur. Bu yüzden <b>keşfin (enumeration) ana kaynağıdır</b>.</p></div>
+<div class="subh">Dizin Bir Ağaçtır</div>
+<figure><svg viewBox="0 0 640 300" role="img" aria-label="example.local domaininin LDAP ağaç yapısı: kök DN altında OU ve CN nesneleri">
+<defs><marker id="ld" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#6d8096"/></marker></defs>
+<rect x="230" y="18" width="180" height="38" rx="9" fill="#16212f" stroke="#a78bfa"/>
+<text x="320" y="42" text-anchor="middle" fill="#c6efff" font-family="monospace" font-size="13">DC=example,DC=local</text>
+<line x1="320" y1="56" x2="130" y2="100" stroke="#6d8096" stroke-width="1.4" marker-end="url(#ld)"/>
+<line x1="320" y1="56" x2="320" y2="100" stroke="#6d8096" stroke-width="1.4" marker-end="url(#ld)"/>
+<line x1="320" y1="56" x2="510" y2="100" stroke="#6d8096" stroke-width="1.4" marker-end="url(#ld)"/>
+<g font-family="monospace" font-size="12" fill="#a7bacc">
+<rect x="60" y="104" width="150" height="34" rx="8" fill="#111926" stroke="#213040"/><text x="135" y="126" text-anchor="middle">CN=Users</text>
+<rect x="245" y="104" width="150" height="34" rx="8" fill="#111926" stroke="#213040"/><text x="320" y="126" text-anchor="middle">OU=Servers</text>
+<rect x="435" y="104" width="150" height="34" rx="8" fill="#111926" stroke="#213040"/><text x="510" y="126" text-anchor="middle">OU=IT</text>
+</g>
+<line x1="135" y1="138" x2="90" y2="182" stroke="#6d8096" stroke-width="1.2" marker-end="url(#ld)"/>
+<line x1="135" y1="138" x2="180" y2="182" stroke="#6d8096" stroke-width="1.2" marker-end="url(#ld)"/>
+<line x1="510" y1="138" x2="510" y2="182" stroke="#6d8096" stroke-width="1.2" marker-end="url(#ld)"/>
+<g font-family="monospace" font-size="11.5" fill="#8fa3b6">
+<rect x="30" y="186" width="120" height="32" rx="7" fill="#0d131c" stroke="#213040"/><text x="90" y="207" text-anchor="middle">CN=ahmet</text>
+<rect x="160" y="186" width="150" height="32" rx="7" fill="#0d131c" stroke="#213040"/><text x="235" y="207" text-anchor="middle">CN=Domain Admins</text>
+<rect x="445" y="186" width="130" height="32" rx="7" fill="#0d131c" stroke="#213040"/><text x="510" y="207" text-anchor="middle">CN=svc_sql</text>
+</g>
+<text x="90" y="248" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#6d8096">objectClass=user</text>
+<text x="235" y="248" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#6d8096">objectClass=group</text>
+<text x="510" y="248" text-anchor="middle" font-family="monospace" font-size="10.5" fill="#6d8096">servicePrincipalName ✔</text>
+</svg>
+<figcaption>LDAP ağacı: kök <b>DN</b> (Base DN) altında OU/CN dalları. Bir sorgu her zaman bir <b>base</b>’den başlar ve bir <b>filtre</b> ile nesneleri süzer. svc_sql’in SPN’i olması onu Kerberoast adayı yapar.</figcaption></figure>
+<div class="prose"><p>Bir LDAP sorgusunun anatomisi: <b>-b</b> (nereden: Base DN) + <b>filtre</b> (hangi nesne: <code>(objectClass=user)</code>) + <b>öznitelikler</b> (ne dönsün: <code>sAMAccountName</code>). <b>RootDSE</b> ise kimlik gerektirmeden okunabilen "sunucu kartı"dır — Base DN’i, forest seviyesini oradan öğrenirsin.</p></div>
+<div class="why"><div class="wt">⚠ NEDEN ZAFİYET — <b>Bilgi sızıntısı & anonim bind</b></div>
+<p>LDAP okumaya <b>çok açıktır</b>: normal bir kullanıcı (bazen anonim bir bağlantı bile) tüm kullanıcı listesini, grup üyeliklerini, servis hesaplarını, delegation bayraklarını ve zayıf ACL’leri okuyabilir. Saldırgan tek bir düşük yetkili hesapla domain’in tüm haritasını çıkarır — bu yüzden BloodHound bu kadar güçlüdür.</p>
+<div class="fix"><b>Savunma:</b> anonim bind kapalı, LDAP signing + channel binding zorunlu, aşırı okuma izinlerinin ve zayıf ACL’lerin denetimi, hassas özniteliklerin korunması.</div></div>`);
+
+/* 4 — NTLM */
+const NTLM={id:'ntlm',actors:['ahmet','Sunucu','DC'],
+ cap:'NTLM challenge–response: parola ağa hiç çıkmaz, ama NT hash bilen biri aynı yanıtı üretebilir. Adımları İleri/Geri ile gez.',
+ steps:[
+  {label:'1. NEGOTIATE',from:0,to:1,name:'Bağlantı isteği',note:'ahmet sunucuya bağlanır ve "NTLM ile kimlik doğrulamak istiyorum, şu özellikleri destekliyorum" der.'},
+  {label:'2. CHALLENGE (nonce)',from:1,to:0,name:'Sunucu meydan okur',note:'Sunucu tahmin edilemez rastgele bir sayı (challenge/nonce) üretip ahmet’e gönderir. Amaç: her oturumu benzersiz yapmak.'},
+  {label:'3. RESPONSE = f(nonce, NT hash)',from:0,to:1,name:'Yanıt: hash ile şifrele',vuln:true,atk:'Pass-the-Hash',
+   note:'ahmet, challenge’ı kendi parolasının NT hash’i ile işleyip yanıtı gönderir. Dikkat: parolanın kendisi ağa HİÇ çıkmaz.',
+   vulnnote:'Yanıtı üretmek için parola değil <b>NT hash</b> yeterlidir. Bir saldırgan bir yerden NT hash’i ele geçirdiyse, parolayı bilmeden bu yanıtı üretip kimliğe bürünür.'},
+  {label:'4. Doğrulama (Netlogon)',from:1,to:2,name:'Sunucu DC’ye sorar',vuln:true,atk:'NTLM Relay',
+   note:'Sunucu challenge+response’u DC’ye iletir; çünkü ahmet’in hash’ini yalnızca DC bilir.',
+   vulnnote:'Sunucu yanıtı yalnızca <b>iletir</b>, kendisi doğrulamaz. Araya giren saldırgan ahmet’in yanıtını <b>başka bir sunucuya</b> iletirse (SMB signing yoksa) ahmet olarak oturum açar → NTLM Relay.'},
+  {label:'5. OK / Erişim',from:2,to:1,name:'DC onaylar',note:'DC doğrular, sunucu ahmet’e oturum açtırır. NTLM stateless’tır: her erişimde bu tekrarlanır.'}
+ ]};
+SEC('ntlm','⇄','NTLM','LEGACY AUTH',`
+<div class="vhead"><div class="eye">LEGACY AUTH · CHALLENGE–RESPONSE</div><h3>NTLM: Parolayı Göndermeden Kimlik Kanıtlama</h3>
+<p class="lead">NTLM eski ama hâlâ her yerde. Mantığı zekice: parolayı ağa göndermeden, parolayı bildiğini kanıtlarsın. Ama bu tasarım üç büyük zafiyetin kapısını aralar: <b>Pass-the-Hash</b>, <b>Relay</b> ve <b>NTLMv1 downgrade</b>.</p></div>
+<div class="subh">Akış — Adım Adım</div>`+diagramBlock(NTLM)+`
+<div class="why"><div class="wt">⚠ NEDEN ZAFİYET — <b>Hash = Parola, ve kimse aracıyı doğrulamaz</b></div>
+<p><b>Pass-the-Hash:</b> Kimlik kanıtı parolanın kendisi değil NT hash’i olduğundan, hash ele geçiren parolayı kırmaya bile gerek duymaz.</p>
+<p><b>NTLM Relay:</b> Sunucu, gelen yanıtı yalnızca DC’ye iletir. Araya giren saldırgan bu geçerli yanıtı <b>başka bir hedefe</b> iletir. SMB/LDAP <b>signing</b> kapalıysa bu iş başarılı olur.</p>
+<p><b>NTLMv1:</b> Eski sürüm zayıf kripto kullanır; downgrade edilirse yanıt neredeyse doğrudan hash’e çevrilebilir.</p>
+<div class="fix"><b>Savunma:</b> SMB & LDAP signing + channel binding zorunlu, NTLMv1 devre dışı, mümkün olan her yerde NTLM yerine Kerberos, LAPS ile benzersiz yerel parolalar (PtH yayılmasını kırar).</div></div>`);
+
+/* 5 — Kerberos */
+const KRB={id:'krb',actors:['ahmet','KDC (DC)','MSSQL Servisi'],
+ cap:'Kerberos: önce KDC’den TGT (kimlik), sonra servise özel TGS (bilet) alınır. Kritik nokta — TGS, hedef servis hesabının hash’iyle şifrelenir.',
+ steps:[
+  {label:'1. AS-REQ (pre-auth: timestamp⊕hash)',from:0,to:1,name:'Kimlik iste (AS-REQ)',vuln:true,atk:'AS-REP Roasting',
+   note:'ahmet, kim olduğunu kanıtlamak için o anki zaman damgasını kendi parola hash’iyle şifreler ve KDC’ye gönderir (pre-authentication).',
+   vulnnote:'Eğer bir hesapta <b>pre-authentication KAPALIYSA</b> bu adım atlanır. KDC kimliği doğrulamadan AS-REP verir; o cevap hesabın hash’iyle şifrelidir → offline kırılır. Buna <b>AS-REP Roasting</b> denir.'},
+  {label:'2. AS-REP: TGT (krbtgt hash ile şifreli)',from:1,to:0,name:'TGT ver (AS-REP)',vuln:true,atk:'Golden Ticket',
+   note:'KDC bir TGT (Ticket Granting Ticket) üretir ve onu KRBTGT hesabının hash’iyle şifreler. ahmet TGT’yi açamaz, sadece taşır — bir "giriş bileti" gibidir.',
+   vulnnote:'TGT’ler krbtgt hash’iyle mühürlendiğinden, bir saldırgan <b>krbtgt hash’ini</b> ele geçirirse istediği kişi için istediği TGT’yi üretebilir → <b>Golden Ticket</b> (domain üzerinde sınırsız, kalıcı kimlik).'},
+  {label:'3. TGS-REQ (TGT + "MSSQL istiyorum")',from:0,to:1,name:'Servis bileti iste (TGS-REQ)',
+   note:'ahmet TGT’sini KDC’ye sunar ve belirli bir servis için (SPN, örn. MSSQL/DB01) bilet ister.'},
+  {label:'4. TGS-REP: TGS (SERVİS hesabı hash ile şifreli)',from:1,to:0,name:'Servis bileti ver (TGS-REP)',vuln:true,atk:'Kerberoasting',
+   note:'KDC, servis biletini (TGS) erişilecek <b>servis hesabının</b> parola hash’iyle şifreler ve ahmet’e verir.',
+   vulnnote:'Herhangi bir kullanıcı, herhangi bir SPN için bu bileti isteyebilir. Bilet <b>servis hesabının hash’iyle</b> şifreli olduğundan offline kırılabilir → <b>Kerberoasting</b>. Zayıf parolalı bir servis hesabı = kolay ele geçirme.'},
+  {label:'5. AP-REQ (TGS’i servise sun)',from:0,to:2,name:'Servise eriş (AP-REQ)',vuln:true,atk:'Silver Ticket',
+   note:'ahmet TGS’i doğrudan MSSQL servisine sunar. Servis bileti kendi hash’iyle açar, geçerliyse erişim verir — DC’ye tekrar sormaz.',
+   vulnnote:'Servis, bileti yalnızca kendi hash’iyle doğrular. Saldırgan <b>servis hesabının hash’ini</b> biliyorsa, DC’ye hiç uğramadan sahte bir TGS üretip o servise erişir → <b>Silver Ticket</b>.'}
+ ]};
+SEC('kerberos','⎈','Kerberos','MODERN AUTH',`
+<div class="vhead"><div class="eye">MODERN AUTH · TICKET BASED</div><h3>Kerberos: Biletlerle Kimlik Doğrulama</h3>
+<p class="lead">Kerberos AD’nin varsayılan kimlik doğrulamasıdır. Mantığı: bir kez kimliğini kanıtla, bir <b>TGT</b> (ana bilet) al; sonra her servise o TGT ile özel bir <b>TGS</b> (servis bileti) iste. Zafiyetlerin çoğu bu biletlerin <b>nasıl şifrelendiğinden</b> doğar.</p></div>
+<div class="subh">Akış — Adım Adım (İleri/Geri ile gez)</div>`+diagramBlock(KRB)+`
+<div class="callout info"><span class="i">🔑</span><div><b>Tek cümlelik anahtar:</b> "Bir bilet, onu <b>açması gereken tarafın</b> parola hash’iyle şifrelenir." TGT → krbtgt hash. TGS → servis hesabı hash. Kerberos zafiyetlerinin tamamı bu tek cümleden türer.</div></div>
+<div class="why"><div class="wt">⚠ NEDEN ZAFİYET — <b>Biletler kırılabilir hash’lerle mühürlenir</b></div>
+<p><b>Kerberoasting (adım 4):</b> Servis biletleri servis hesabının hash’iyle şifreli; herkes isteyebilir → zayıf servis parolaları offline kırılır. En yaygın domain ele geçirme yolu.</p>
+<p><b>AS-REP Roasting (adım 1):</b> Pre-auth kapalı hesaplarda ilk cevap kimliksiz alınıp kırılabilir.</p>
+<p><b>Golden Ticket (krbtgt) / Silver Ticket (servis hash):</b> İlgili hash ele geçerse sahte, "meşru görünen" biletler üretilir.</p>
+<div class="fix"><b>Savunma:</b> uzun/rastgele (25+) servis hesabı parolaları veya gMSA, pre-auth’un her hesapta açık olması, RC4 yerine AES şifreleme, krbtgt parolasının düzenli (iki kez) döndürülmesi, Kerberoast avlanan hesap sayısının azaltılması.</div></div>`);
+
+/* 6 — Delegation */
+SEC('delegation','⇅','Delegation','IMPERSONATION',`
+<div class="vhead"><div class="eye">IMPERSONATION · KİMLİĞE BÜRÜNME</div><h3>Delegation: Bir Servisin Senin Adına Konuşması</h3>
+<p class="lead">Delegation meşru bir ihtiyaçtır: bir web sunucusu, senin adına arka plandaki veritabanına gitmek isteyebilir. Ama yanlış yapılandırılırsa, bir sunucuyu ele geçiren saldırgan <b>herkesin kimliğine bürünebilir</b> — Domain Admin dahil.</p></div>
+<div class="subh">Üç Tür — ve Neden Tehlikeli</div>
+<figure><svg viewBox="0 0 660 150" role="img" aria-label="Unconstrained delegation: kullanıcı TGT’sini sunucuya bırakır, ele geçen sunucu bu TGT ile her yere gider">
+<defs><marker id="da" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#f87171"/></marker>
+<marker id="dg" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><polygon points="0,0 9,4.5 0,9" fill="#6d8096"/></marker></defs>
+<g font-family="var(--sans)" font-size="12.5">
+<rect x="20" y="55" width="120" height="40" rx="9" fill="#16212f" stroke="#2c3f52"/><text x="80" y="80" text-anchor="middle" fill="#e7eef5">ahmet</text>
+<rect x="270" y="55" width="140" height="40" rx="9" fill="#16212f" stroke="#f87171"/><text x="340" y="80" text-anchor="middle" fill="#ffc9c9">Web Sunucu</text>
+<rect x="540" y="30" width="100" height="34" rx="8" fill="#111926" stroke="#213040"/><text x="590" y="52" text-anchor="middle" fill="#a7bacc">DB01</text>
+<rect x="540" y="86" width="100" height="34" rx="8" fill="#111926" stroke="#213040"/><text x="590" y="108" text-anchor="middle" fill="#a7bacc">DC01</text>
+</g>
+<line x1="140" y1="75" x2="266" y2="75" stroke="#6d8096" stroke-width="1.6" marker-end="url(#dg)"/>
+<text x="203" y="66" text-anchor="middle" fill="#8fa3b6" font-family="monospace" font-size="11">TGT’yi bırakır</text>
+<line x1="410" y1="70" x2="536" y2="48" stroke="#f87171" stroke-width="1.8" marker-end="url(#da)"/>
+<line x1="410" y1="80" x2="536" y2="103" stroke="#f87171" stroke-width="1.8" marker-end="url(#da)"/>
+<text x="475" y="98" text-anchor="middle" fill="#ffb3b3" font-family="monospace" font-size="11">ahmet gibi gider</text>
+</svg>
+<figcaption><b>Unconstrained delegation:</b> ahmet bağlanınca TGT’sinin bir kopyası sunucuda kalır. Sunucu ele geçerse, saldırgan bu TGT ile ahmet olarak <b>her yere</b> gidebilir. Bir DC’yi bu sunucuya bağlanmaya zorlarsan (coerce), Domain Admin TGT’si düşer.</figcaption></figure>
+<div class="cards">
+<div class="ccard"><div class="tag">en tehlikeli</div><h4>Unconstrained</h4><p>Sunucu, bağlanan herkesin TGT’sini saklar ve <b>her servise</b> onların adına gidebilir. Ele geçen sunucu = kimliğe bürünme cenneti. DC coerce → DA.</p></div>
+<div class="ccard"><div class="tag">sınırlı</div><h4>Constrained</h4><p>Sunucu yalnızca <b>belirli servislere</b> kullanıcı adına gidebilir (<span class="mono">msDS-AllowedToDelegateTo</span>). S4U2Self/Proxy ile o servisler için bilet üretebilir.</p></div>
+<div class="ccard"><div class="tag">kaynak-taraflı</div><h4>RBCD</h4><p>Hedef nesne "kim benim adıma davranabilir" der (<span class="mono">msDS-AllowedToActOnBehalfOfOtherIdentity</span>). Bu özniteliğe <b>yazma yetkin</b> varsa kendini eklersin → o hedefte kimliğe bürünürsün.</p></div>
+</div>
+<div class="why"><div class="wt">⚠ NEDEN ZAFİYET — <b>Kimliğe bürünme yetkisi yanlış yerde</b></div>
+<p>Delegation, bir hesaba "başkası gibi davran" gücü verir. Unconstrained’de bu güç sınırsızdır; constrained/RBCD’de ise ilgili özniteliğe <b>yazma yetkisi</b> olan herkes bu gücü kendine devredebilir. Bir yazma izni (GenericWrite/WriteProperty) böylece kimlik hırsızlığına dönüşür.</p>
+<div class="fix"><b>Savunma:</b> unconstrained delegation’ı yok et (özellikle DC dışı hostlarda), hassas hesapları "Account is sensitive and cannot be delegated" ile işaretle, Protected Users grubu, delegation özniteliklerine yazma izinlerini sıkı denetle.</div></div>`);
+
+/* 7 — Saldırı Haritası */
+SEC('attackmap','◎','Saldırı Haritası','MENTAL MODEL',`
+<div class="vhead"><div class="eye">MENTAL MODEL · HER ŞEYİ BAĞLA</div><h3>Saldırı Haritası: Teknik → Protokol → Neden Mümkün → Savunma</h3>
+<p class="lead">Her saldırı bir mekanizmanın yan ürünüdür. Bu tabloyu ezberleme; kolonları arasındaki <b>nedensellik zincirini</b> anla. "Neden mümkün" kolonu, önceki modüllerin özetidir.</p></div>
+<div class="tblwrap"><table style="min-width:760px"><thead><tr>
+<th>Teknik</th><th>Protokol</th><th>Neden mümkün</th><th>Savunma</th></tr></thead><tbody>
+<tr><td><b>Kerberoasting</b></td><td>Kerberos</td><td>TGS servis hesabı hash’iyle şifreli; herkes isteyebilir</td><td>Uzun parola/gMSA, AES, SPN azalt</td></tr>
+<tr><td><b>AS-REP Roasting</b></td><td>Kerberos</td><td>Pre-auth kapalı → hash’li cevap kimliksiz alınır</td><td>Pre-auth’u her hesapta aç</td></tr>
+<tr><td><b>Golden Ticket</b></td><td>Kerberos</td><td>Tüm TGT’ler krbtgt hash’iyle mühürlü</td><td>krbtgt’yi 2× döndür, DC koruması</td></tr>
+<tr><td><b>Silver Ticket</b></td><td>Kerberos</td><td>Servis bileti yalnız servis hash’iyle doğrulanır</td><td>Servis hesabı hijyeni, AES</td></tr>
+<tr><td><b>Pass-the-Hash</b></td><td>NTLM</td><td>Kimlik kanıtı = NT hash (parola değil)</td><td>LAPS, tiering, Credential Guard</td></tr>
+<tr><td><b>NTLM Relay</b></td><td>NTLM</td><td>Aracı yanıtı yalnız iletir; signing yoksa yönlendirilir</td><td>SMB/LDAP signing + channel binding</td></tr>
+<tr><td><b>ACL Abuse</b> (GenericAll…)</td><td>LDAP</td><td>Yanlış ACE = nesne üzerinde kontrol</td><td>ACL denetimi, en az yetki</td></tr>
+<tr><td><b>Delegation Abuse</b></td><td>Kerberos</td><td>Kimliğe bürünme yetkisi yanlış yerde</td><td>Unconstrained’i kaldır, Protected Users</td></tr>
+<tr><td><b>DCSync</b></td><td>MS-RPC (DRSUAPI)</td><td>Replikasyon izni olan hash çeker (krbtgt dahil)</td><td>Replikasyon izinlerini sınırla</td></tr>
+<tr><td><b>Enumeration</b></td><td>LDAP</td><td>Dizin düşük yetkiye açık</td><td>Anon bind kapalı, izin denetimi</td></tr>
+</tbody></table></div>
+<div class="callout ok"><span class="i">✓</span><div>Bu haritayı okuyabiliyorsan, panellerdeki (command-center / field-playbook) her komutun <b>neden</b> çalıştırıldığını da anlıyorsun demektir. Kavram + metodoloji + pratik birleşince beceri oluşur.</div></div>`);
+
+/* 8 — Sözlük */
+const GLOSS=[
+ ['TGT','Ticket Granting Ticket','Kerberos’ta "ana giriş bileti". krbtgt hash’iyle şifrelidir; her servis biletini istemek için kullanılır.'],
+ ['TGS','Ticket Granting Service ticket','Belirli bir servise erişim bileti. Hedef servis hesabının hash’iyle şifrelidir.'],
+ ['KDC','Key Distribution Center','Biletleri üreten servis; pratikte Domain Controller üzerinde çalışır.'],
+ ['krbtgt','Kerberos hizmet hesabı','TGT’leri şifreleyen anahtar. Hash’i ele geçerse Golden Ticket üretilir.'],
+ ['SPN','Service Principal Name','Bir servisi tanımlayan ad (MSSQL/DB01). SPN taşıyan kullanıcı hesabı Kerberoast adayıdır.'],
+ ['NT hash','NTLM parola özeti','Parolanın tek yönlü özeti. NTLM’de kimlik kanıtı budur → Pass-the-Hash.'],
+ ['Pre-auth','Pre-authentication','Kerberos AS aşamasında kimliği baştan kanıtlama. Kapalıysa AS-REP Roasting mümkün olur.'],
+ ['DN / Base DN','Distinguished Name','LDAP’ta bir nesnenin tam yolu. Base DN = aramanın başladığı kök (DC=example,DC=local).'],
+ ['RootDSE','—','Kimliksiz okunabilen sunucu meta verisi; Base DN ve forest seviyesini verir.'],
+ ['ACL / ACE','Access Control List / Entry','Bir nesnede "kim ne yapabilir". Yanlış bir ACE doğrudan ele geçirme yoludur.'],
+ ['SID','Security Identifier','Nesnenin benzersiz güvenlik kimliği. İzinler isme değil SID’e bağlıdır.'],
+ ['Signing','SMB/LDAP imzalama','Mesajların bütünlüğünü doğrular. Kapalıysa NTLM Relay mümkün olur.'],
+ ['gMSA','Group Managed Service Account','Parolası AD tarafından otomatik yönetilen, uzun ve rastgele servis hesabı → Kerberoast’a dirençli.'],
+ ['Coercion','Zorlama','Bir makineyi (örn. DC) sana kimlik doğrulamaya zorlama (PetitPotam vb.). Relay/delegation ile birleşir.'],
+ ['DCSync','—','Replikasyon iznini kullanarak DC’den parola hash’lerini (krbtgt dahil) çekme tekniği.']
+];
+SEC('glossary','▦','Sözlük','QUICK REFERENCE',`
+<div class="vhead"><div class="eye">QUICK REFERENCE · TERİMLER</div><h3>Sözlük</h3>
+<p class="lead">Diyagramlarda ve panellerde geçen terimlerin kısa karşılıkları. Terim İngilizce (sahada öyle geçer), açıklama Türkçe.</p></div>
+<dl class="glossary">`+GLOSS.map(g=>`<div class="gitem"><dt>${g[0]} <span class="en">${g[1]?'· '+g[1]:''}</span></dt><dd>${g[2]}</dd></div>`).join('')+`</dl>`);
+
+/* 9 — Quiz */
+SEC('quiz','✔','Bilgini Test Et','CHECK YOURSELF',`
+<div class="vhead"><div class="eye">CHECK YOURSELF · MİNİ QUIZ</div><h3>Bilgini Test Et</h3>
+<p class="lead">Kavramları anladın mı? Her soruda bir şık seç; anında açıklama görürsün. Amaç puan değil, "neden" mantığını pekiştirmek.</p></div>
+<div id="quizHost"></div>
+<div class="quizbar"><button id="quizCheck">Sonucu göster</button><span class="scoreb" id="scoreb"></span></div>`);
+
+const QUIZ=[
+ {q:'Kerberoasting neden mümkündür?',
+  opts:['Çünkü TGT krbtgt hash’iyle şifrelidir','Çünkü TGS servis hesabının hash’iyle şifrelidir ve herkes isteyebilir','Çünkü NTLM signing kapalıdır','Çünkü pre-auth kapalıdır'],
+  c:1,e:'TGS, erişilecek servis hesabının parola hash’iyle şifrelenir. Herhangi bir kullanıcı bu bileti isteyip offline kırmayı deneyebilir → zayıf servis parolaları hedeftir.'},
+ {q:'NTLM’de "parola ağa çıkmıyor" olması neden yine de yeterli koruma değildir?',
+  opts:['Çünkü challenge tahmin edilebilir','Çünkü kimlik kanıtı NT hash’tir; hash’i olan parolayı bilmeden yanıt üretir','Çünkü DC her zaman güvenir','Çünkü Kerberos devreye girer'],
+  c:1,e:'Kimlik kanıtı parola değil NT hash olduğundan, hash’i ele geçiren Pass-the-Hash ile kimliğe bürünür. Parolayı kırmaya bile gerek yoktur.'},
+ {q:'AS-REP Roasting hangi yanlış yapılandırmadan doğar?',
+  opts:['SMB signing kapalı','Bir hesapta pre-authentication kapalı','LDAP anonim bind açık','krbtgt parolası eski'],
+  c:1,e:'Pre-auth kapalı bir hesapta KDC, kimliği doğrulamadan hesabın hash’iyle şifreli AS-REP verir; bu cevap kimliksiz alınıp offline kırılabilir.'},
+ {q:'NTLM Relay’i esas olarak ne engeller?',
+  opts:['Daha uzun parola','SMB/LDAP signing + channel binding','Daha fazla DC','Antivirüs'],
+  c:1,e:'Relay, geçerli bir yanıtı başka hedefe iletmeye dayanır. Signing/channel binding, mesajı oturuma bağladığı için yönlendirmeyi kırar.'},
+ {q:'Golden Ticket’ı mümkün kılan hangi hash’in ele geçmesidir?',
+  opts:['Servis hesabının hash’i','krbtgt hesabının hash’i','ahmet’in NT hash’i','DC’nin makine hash’i'],
+  c:1,e:'Tüm TGT’ler krbtgt hash’iyle mühürlenir. Bu hash ele geçerse istenen kişi için istenen TGT üretilebilir — kalıcı, sınırsız kimlik.'},
+ {q:'Unconstrained delegation neden en tehlikeli türdür?',
+  opts:['Yavaş olduğu için','Sunucu, bağlanan herkesin TGT’sini saklayıp her servise onlar adına gidebildiği için','Sadece DC’de çalıştığı için','Parola gerektirmediği için'],
+  c:1,e:'Ele geçen bir unconstrained host, üzerinde biriken TGT’lerle (bir DC’yi coerce ederek DA dahil) herkesin kimliğine bürünebilir.'},
+ {q:'Düşük yetkili tek bir hesapla tüm domain haritasını çıkarmak neden mümkün?',
+  opts:['Kerberos zayıf olduğu için','LDAP dizini okumaya çok açık olduğu için (kullanıcı/grup/ACL/delegation okunur)','SMB signing kapalı olduğu için','DC güvenlik duvarı olmadığı için'],
+  c:1,e:'LDAP ile normal bir kullanıcı bile nesneleri, üyelikleri, delegation bayraklarını ve zayıf ACL’leri okuyabilir; BloodHound bu veriyle yolları çıkarır.'}
+];
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+const viewsEl=document.getElementById('views'),navEl=document.getElementById('nav');
+SECTIONS.forEach((s,i)=>{
+  const a=document.createElement('a');a.href='#'+s.id;a.dataset.sec=s.id;
+  a.innerHTML=`<span class="n">${String(i+1).padStart(2,'0')}</span><span class="ic">${s.icon}</span><span class="lbl">${s.title}</span><span class="done">✓</span>`;
+  navEl.appendChild(a);
+  const sec=document.createElement('section');sec.className='view'+(i===0?' active':'');sec.id='view-'+s.id;
+  sec.innerHTML=s.html;viewsEl.appendChild(sec);
+});
+const secIds=SECTIONS.map(s=>s.id);
+const navLinks=[...navEl.querySelectorAll('a')];
+
+/* quiz render */
+const quizHost=document.getElementById('quizHost');
+if(quizHost){
+  quizHost.innerHTML=QUIZ.map((q,qi)=>`<div class="quiz" data-qi="${qi}">
+    <div class="qn">Soru ${qi+1} / ${QUIZ.length}</div><div class="qq">${q.q}</div>
+    ${q.opts.map((o,oi)=>`<div class="opt" data-oi="${oi}">${o}</div>`).join('')}
+    <div class="exp">${q.e}</div></div>`).join('');
+}
+
+/* ---------- persistence ---------- */
+const LS='adacademy_v1';
+let store=JSON.parse(localStorage.getItem(LS)||'{}');
+store.visited=store.visited||{};store.quiz=store.quiz||{};
+function save(){try{localStorage.setItem(LS,JSON.stringify(store))}catch(e){}}
+
+function markVisited(id){
+  store.visited[id]=1;save();
+  const a=navEl.querySelector('a[data-sec="'+id+'"]');if(a)a.classList.add('visited');
+  updateProgress();
+}
+function updateProgress(){
+  const total=secIds.length,done=secIds.filter(id=>store.visited[id]).length;
+  const pct=Math.round(done/total*100);
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('ppct').textContent=pct+'%';
+}
+secIds.forEach(id=>{if(store.visited[id]){const a=navEl.querySelector('a[data-sec="'+id+'"]');if(a)a.classList.add('visited');}});
+
+/* ---------- view switching ---------- */
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+id));
+  navLinks.forEach(a=>a.classList.toggle('active',a.dataset.sec===id));
+  const s=SECTIONS.find(x=>x.id===id);if(s)document.getElementById('topTitle').textContent=s.title;
+  window.scrollTo({top:0,behavior:'auto'});
+  markVisited(id);
+  // init diagrams in this view
+  document.querySelectorAll('#view-'+id+' .player').forEach(p=>{if(!p.dataset.init)initDiagram(p.dataset.diag);});
+  if(window.innerWidth<=900){document.getElementById('sidebar').classList.remove('show');document.getElementById('scrim').classList.remove('show');}
+}
+navLinks.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showView(a.dataset.sec);history.replaceState(null,'','#'+a.dataset.sec);}));
+document.getElementById('nextBtn').addEventListener('click',()=>{
+  const cur=navLinks.findIndex(a=>a.classList.contains('active'));
+  const nx=secIds[(cur+1)%secIds.length];showView(nx);history.replaceState(null,'','#'+nx);
+});
+
+/* ---------- diagram step players ---------- */
+const DIAGRAMS={ntlm:NTLM,krb:KRB};
+const diagState={};
+function initDiagram(did){
+  const p=document.querySelector('.player[data-diag="'+did+'"]');if(!p)return;p.dataset.init='1';
+  diagState[did]=0;
+  p.querySelectorAll('[data-act]').forEach(btn=>btn.addEventListener('click',()=>{
+    const act=btn.dataset.act,d=DIAGRAMS[did],last=d.steps.length-1;
+    if(act==='next')diagState[did]=Math.min(last,diagState[did]+1);
+    if(act==='prev')diagState[did]=Math.max(0,diagState[did]-1);
+    if(act==='play')diagState[did]=0;
+    renderDiag(did);
+  }));
+  // click a step arrow
+  document.querySelectorAll('#svgwrap-'+did+' .seqstep').forEach(g=>g.addEventListener('click',()=>{
+    diagState[did]=+g.dataset.idx;renderDiag(did);
+  }));
+  renderDiag(did);
+}
+function renderDiag(did){
+  const cur=diagState[did],d=DIAGRAMS[did];
+  document.querySelectorAll('#svgwrap-'+did+' .seqstep').forEach(g=>{
+    const i=+g.dataset.idx;g.classList.toggle('active',i===cur);g.classList.toggle('seen',i<cur);
+  });
+  document.getElementById('cnt-'+did).textContent='Adım '+(cur+1)+' / '+d.steps.length;
+  const st=d.steps[cur],exp=document.getElementById('exp-'+did);
+  let html=`<div class="stepname">${st.name||st.label}</div><div class="stepnote">${st.note}</div>`;
+  if(st.vuln){html+=`<div class="vulnrow"><b>⚠ Neden zafiyet:</b> ${st.vulnnote||''} ${st.atk?`<span class="atk">${st.atk}</span>`:''}</div>`;}
+  exp.className='expbox'+(st.vuln?' vuln':'');exp.innerHTML=html;
+  const p=document.querySelector('.player[data-diag="'+did+'"]');
+  p.querySelector('[data-act="prev"]').disabled=cur===0;
+  p.querySelector('[data-act="next"]').disabled=cur===d.steps.length-1;
+}
+
+/* ---------- quiz logic ---------- */
+document.addEventListener('click',e=>{
+  const opt=e.target.closest('.quiz .opt');
+  if(opt){const quiz=opt.closest('.quiz'),qi=+quiz.dataset.qi;
+    if(quiz.dataset.locked)return;
+    quiz.dataset.locked='1';const oi=+opt.dataset.oi,correct=QUIZ[qi].c;
+    quiz.querySelectorAll('.opt').forEach(o=>{const k=+o.dataset.oi;
+      if(k===correct)o.classList.add('correct');else if(k===oi)o.classList.add('wrong');});
+    quiz.querySelector('.exp').classList.add('show');
+    store.quiz[qi]=(oi===correct)?1:0;save();
+  }
+});
+const quizCheck=document.getElementById('quizCheck');
+if(quizCheck)quizCheck.addEventListener('click',()=>{
+  const answered=Object.keys(store.quiz).length,correct=Object.values(store.quiz).filter(v=>v===1).length;
+  document.getElementById('scoreb').textContent=`Doğru: ${correct} / ${QUIZ.length}`+(answered<QUIZ.length?`  (${QUIZ.length-answered} soru boş)`:'  ✓ tamamlandı');
+});
+
+/* ---------- mobile ---------- */
+document.getElementById('mburg').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.toggle('show');document.getElementById('scrim').classList.toggle('show');});
+document.getElementById('scrim').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.remove('show');document.getElementById('scrim').classList.remove('show');});
+
+/* ---------- boot ---------- */
+updateProgress();
+let boot='overview';if(location.hash&&secIds.includes(location.hash.slice(1)))boot=location.hash.slice(1);
+showView(boot);
+</script>
+</body>
+</html>
